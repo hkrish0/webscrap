@@ -133,7 +133,7 @@ class ScrapformController extends Controller
 
 	public function getArihant($publisher_id,$url,$uri,$attr)
 	{
-		$count=1;
+		
 		$url = $url.$uri;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		$client = new Client();
@@ -147,7 +147,7 @@ class ScrapformController extends Controller
 	        foreach ($filter as $content) {
 	        	$crawler = new Crawler($content);
 	        	$count=Book::model()->countByAttributes(array("publisher_id"=>17));
-	        	if($count==0)$count=1;
+	        	$count++;
 	        	$book=new Book;
 	    		$book->book_name = $crawler->filter('a.prdocutname')->html();
 	    		$book->mrp = $crawler->filter('span.priceold')->html();
@@ -157,7 +157,7 @@ class ScrapformController extends Controller
 	    		$book->publisher_id=$publisher_id;
 	    		$book->category_id='1';
 	    		$book->attribute=$attr;
-	    		$book->product_id='ARIH'.($count++);
+	    		$book->product_id='ARIH'.($count);
 	    		$nostock=$crawler->filter('span.nostock')->count();
 	    		if($nostock==0)
 	    		$valid=$book->save(false);	
