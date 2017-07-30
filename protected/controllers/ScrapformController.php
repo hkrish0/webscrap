@@ -147,6 +147,7 @@ class ScrapformController extends Controller
 	        foreach ($filter as $content) {
 	        	$crawler = new Crawler($content);
 	        	$count=Book::model()->countByAttributes(array("publisher_id"=>17));
+	        	if($count==0)$count=1;
 	        	$book=new Book;
 	    		$book->book_name = $crawler->filter('a.prdocutname')->html();
 	    		$book->mrp = $crawler->filter('span.priceold')->html();
