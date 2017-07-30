@@ -29,7 +29,7 @@ class ScrapformController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','test'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -392,9 +392,10 @@ class ScrapformController extends Controller
      } 
 	
 	private function filter_number_from_string($string) {
-        $string = strtolower($string);
-        $string = preg_replace('/[a-z.]/', '', $string);
-        return $string;
+        //$string = strtolower($string);
+       	preg_match_all('!\d+!', $string, $matches);
+        //$string = preg_replace('/[a-z.]/', '', $string);
+        return implode("",$matches[0]);
     }
 
     private function roundUpToAny($n,$x=5,$y=10) {
@@ -408,7 +409,14 @@ class ScrapformController extends Controller
     }
 
 
-
+    public function actionTest()
+    {
+    	
+    	$str="Rs.155000";
+    	preg_match_all('!\d+!', $str, $matches);
+    	print_r($matches[0]);
+    	echo implode("",$matches[0]);
+    }
 
 	/**
 	 * Updates a particular model.
