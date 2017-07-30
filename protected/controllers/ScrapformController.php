@@ -241,7 +241,7 @@ class ScrapformController extends Controller
                 'stock_status_id' => $stock_status,
                 'image' => $imageFile,
                 'manufacturer_id' => 17,
-                'price' =>filter_number_from_string($data['mrp']),
+                'price' =>$this->filter_number_from_string($data['mrp']),
                 'cost' => 0,
                 'edit' => $data['edition'],
                 'sku' => '',
