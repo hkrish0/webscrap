@@ -32,6 +32,7 @@
 				array('label'=>'Get books', 'url'=>array('/scrapform/create')),
 				array('label'=>'Get Book Details', 'url'=>array('/scrapform/details')),
 				array('label'=>'Add to Mount', 'url'=>array('/scrapform/addmount')),
+				array('label'=>'GK', 'url'=>array('/scrapform/getgk')),
 				array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),

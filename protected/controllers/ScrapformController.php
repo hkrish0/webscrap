@@ -8,6 +8,7 @@ class ScrapformController extends Controller
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
 	 */
 	public $layout='//layouts/column2';
+	 public $defaultAction = 'create';
 
 	/**
 	 * @return array action filters
@@ -29,7 +30,7 @@ class ScrapformController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','test'),
+				'actions'=>array('index','view','test','getgk'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -222,6 +223,61 @@ class ScrapformController extends Controller
         
 	}
 
+
+	/* Get Gk publication Books */
+
+	public function actionGetgk()
+	{
+		$count=0;
+		//https://www.gkpublications.com/index.php?route=product/category&path=150_238
+		$url="https://www.gkpublications.com/index.php?route=product/category&path=150";
+		//$url = $url.$uri;
+		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
+		$client = new Client();
+		$res = $client->request('GET', $url);
+		$contents=$res->getBody()->getContents();
+		$crawler = new Crawler($contents);
+        $filter = $crawler->filter('div.tree-menu')->filter('ul.box-category')->filter('ul.accordion-body')->filter('li');
+        //echo "<pre>",print_r($filter),"</pre>";exit;
+
+        try
+        {
+	        foreach ($filter as $content) {
+	        	$crawler = new Crawler($content);
+	        	foreach($crawler as $sample)
+	        	echo "<pre>",print_r($sample),"</pre>";exit;
+	        	// $data=$crawler->filter('a')->html();
+	        	// echo $data."<br/>";
+	        	//$count++;
+	      //   	$count=Book::model()->countByAttributes(array("publisher_id"=>17));
+	      //   	$count++;
+	      //   	$book=new Book;
+	    		// $book->book_name = $crawler->filter('a.prdocutname')->html();
+	    		// $book->mrp = $crawler->filter('span.priceold')->html();
+	    		// $book->discount_price = $this->calculateDiscount($book->mrp);
+	    		// $book->book_url = $crawler->filter('a.prdocutname')->attr('href');
+	    		// $book->image_thumb_url = $crawler->filter('div.thumbnail > a > img')->attr('src');
+	    		// $book->publisher_id=$publisher_id;
+	    		// $book->category_id='1';
+	    		// $book->attribute=$attr;
+	    		// $book->product_id='ARIH'.($count);
+	    		// $nostock=$crawler->filter('span.nostock')->count();
+	    		// if($nostock==0)
+	    		// $valid=$book->save(false);	
+	        }
+	        //echo "count=".$count;
+	        exit;
+	        if($valid)
+         		return 'success'.$count; 
+    	}	
+        catch(\Exception $e) {
+            echo $e->getMessage();
+            $result['status'] = 'failed';
+            return $result;
+        }
+       
+	}
+
 	/* Pushing the data to mountcart database */
 
 
@@ -259,7 +315,7 @@ class ScrapformController extends Controller
                 'date_added' => new CDbExpression('NOW()'),
                 'date_modified' => new CDbExpression('NOW()'),
             ));
-
+            //var_dump(debug_backtrace());exit;
             $result['oc_product_status'] = 'Success';
 
             $product_id = Yii::app()->db2->getLastInsertID();
@@ -343,8 +399,8 @@ class ScrapformController extends Controller
         //$destdir = '/var/www/mountcart/image/data/';
         //$destdir = "/home/mountcart12/www/image/data/";
         	$link='https:'.$book['image_main_url'];
-	        //$destdir = "/var/www/html/mcscrap/image/data/";
-	        $destdir = "/home/mynewmountcart/www/image/data/";
+	        $destdir = "/var/www/html/mcscrap/image/data/";
+	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        $extension = pathinfo($link, PATHINFO_EXTENSION);
 	        $img=file_get_contents($link);
 	        $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
