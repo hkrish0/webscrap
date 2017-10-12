@@ -15,6 +15,8 @@ class Scrapform extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+	public $publisher_cat;
+	public $mount_categories;
 	public function tableName()
 	{
 		return 'scrapform';
@@ -28,7 +30,7 @@ class Scrapform extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('publisher_id, url, uri, attribute', 'required'),
+			array('publisher_id, url', 'required'),
 			array('publisher_id', 'numerical', 'integerOnly'=>true),
 			array('uri, attribute', 'length', 'max'=>100),
 			// The following rule is used by search().
@@ -59,6 +61,9 @@ class Scrapform extends CActiveRecord
 			'url' => 'Url',
 			'uri' => 'Uri',
 			'attribute' => 'Attribute',
+			'publisher_cat' =>'Publisher Categories',
+			'mount_categories' => 'Mount Categories'
+
 		);
 	}
 

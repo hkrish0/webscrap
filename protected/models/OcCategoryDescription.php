@@ -1,24 +1,24 @@
 <?php
 
 /**
- * This is the model class for table "publisher".
+ * This is the model class for table "oc_category_description".
  *
- * The followings are the available columns in table 'publisher':
- * @property integer $id
- * @property string $publisher_name
- * @property string $function_name
- * @property string $function_name_other
- * @property string $url
- * @property string $uri
+ * The followings are the available columns in table 'oc_category_description':
+ * @property integer $category_id
+ * @property integer $language_id
+ * @property string $name
+ * @property string $description
+ * @property string $meta_description
+ * @property string $meta_keyword
  */
-class Publisher extends CActiveRecord
+class OcCategoryDescription extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'publisher';
+		return 'oc_category_description';
 	}
 
 	/**
@@ -29,15 +29,12 @@ class Publisher extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, publisher_name, function_name, function_name_other', 'required'),
-			array('id', 'numerical', 'integerOnly'=>true),
-			array('publisher_name', 'length', 'max'=>100),
-			array('function_name', 'length', 'max'=>50),
-			array('function_name_other', 'length', 'max'=>40),
-			array('url, uri', 'safe'),
+			array('category_id, language_id, name, description, meta_description, meta_keyword', 'required'),
+			array('category_id, language_id', 'numerical', 'integerOnly'=>true),
+			array('name, meta_description, meta_keyword', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, publisher_name, function_name, function_name_other, url, uri', 'safe', 'on'=>'search'),
+			array('category_id, language_id, name, description, meta_description, meta_keyword', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,12 +55,12 @@ class Publisher extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'publisher_name' => 'Publisher Name',
-			'function_name' => 'Function Name',
-			'function_name_other' => 'Function Name Other',
-			'url' => 'Url',
-			'uri' => 'Uri',
+			'category_id' => 'Category',
+			'language_id' => 'Language',
+			'name' => 'Name',
+			'description' => 'Description',
+			'meta_description' => 'Meta Description',
+			'meta_keyword' => 'Meta Keyword',
 		);
 	}
 
@@ -85,12 +82,12 @@ class Publisher extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('publisher_name',$this->publisher_name,true);
-		$criteria->compare('function_name',$this->function_name,true);
-		$criteria->compare('function_name_other',$this->function_name_other,true);
-		$criteria->compare('url',$this->url,true);
-		$criteria->compare('uri',$this->uri,true);
+		$criteria->compare('category_id',$this->category_id);
+		$criteria->compare('language_id',$this->language_id);
+		$criteria->compare('name',$this->name,true);
+		$criteria->compare('description',$this->description,true);
+		$criteria->compare('meta_description',$this->meta_description,true);
+		$criteria->compare('meta_keyword',$this->meta_keyword,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -101,7 +98,7 @@ class Publisher extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return Publisher the static model class
+	 * @return OcCategoryDescription the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

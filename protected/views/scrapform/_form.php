@@ -21,9 +21,34 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'publisher_id'); ?>
-		<?php echo $form->dropDownList($model, 'publisher_id', CHtml::listData(Publisher::model()->findAll(), 'id', 'publisher_name'));?>
+		<?php echo $form->dropDownList($model, 'publisher_id', CHtml::listData(Publisher::model()->findAll(), 'id', 'publisher_name'),array('ajax' => array('type'=>'POST','url'=>CController::createUrl('publisher/getpublishercategories'),'update'=>'#Scrapform_publisher_cat',
+		),'prompt'=>'Select Publisher'));?>
 		<?php echo $form->error($model,'publisher_id'); ?>
 	</div>
+
+
+	<div class="row">
+		<?php echo CHtml::activeLabel($model,'publisher_cat'); ?>
+		<?php echo $form->dropDownList($model, 'publisher_cat', CHtml::listData(Category::model()->findAll(), 'id', 'category_name'),array('ajax' => array('type'=>'POST','url'=>CController::createUrl('category/getcategoryurl'),'update'=>'#Scrapform_url',
+		),'prompt'=>'Select Publisher Category'));?>
+		<?php //echo $form->error($model,'publisher_id'); ?>
+	</div>
+
+
+	<div class="row">
+		<?php echo CHtml::activeLabel($model,'mount_categories'); ?>
+		<?php echo $form->dropDownList($model, 'mount_categories', CHtml::listData(OcCategoryDescription::model()->findAll(), 'category_id', 'name'),array('empty'=>'','multiple'=>true ,'style'=>'width:400px;','size'=>'10'));?>
+		<?php //echo $form->error($model,'publisher_id'); ?>
+	</div>
+
+
+	<?php 
+	$this->widget('ext.chosen.EChosenWidget',array(
+	    'selector'=>'#Scrapform_mount_categories',
+	    'options'=>array(),
+	)); ?>
+
+
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'url'); ?>

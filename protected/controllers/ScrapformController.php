@@ -30,11 +30,11 @@ class ScrapformController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view','test','getgk'),
+				'actions'=>array('index','view','test'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','details','addmount'),
+				'actions'=>array('create','update','details','addmount','getgk','getgkcat','getgkdetails','deleteall'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -65,16 +65,19 @@ class ScrapformController extends Controller
 	public function actionCreate()
 	{
 		$model=new Scrapform;
-		$model->url='https://www.arihantbooks.com/';
 		if(isset($_POST['Scrapform']))
 		{
 			$model->attributes=$_POST['Scrapform'];
 			$publisher_id=$model->publisher_id;
+			$publisher=Publisher::model()->findByPk($publisher_id);
+			$publisher_function=$publisher->function_name;
 			$url=$model->url;
-			$uri=$model->uri;
+			$uri=$publisher->uri;
 			$attr=$model->attribute;
-			$status=$this->getArihant($publisher_id,$url,$uri,$attr);
-			echo $status;	
+			$mountcart_categories=json_encode($_POST['Scrapform']['mount_categories']);
+			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories);
+			$result=json_decode($status);
+			echo "Status: ".$result->status."<br/> Message: ".$result->message." </br> Error: ".$result->error;	
 		}
 
 		$this->render('create',array(
@@ -87,24 +90,26 @@ class ScrapformController extends Controller
 		if(isset($_POST['publisher_id']))
 		{
 			$publisher_id=$_POST['publisher_id'];
-			$status=$this->getArihantdetails($publisher_id);
-			
-			if($status=='error')			
-				echo "No more books for fetch details";
+			$publisher=Publisher::model()->findByPk($publisher_id);
+			$publisher_function=$publisher->function_name_other;
+			$status=$this->$publisher_function($publisher_id);
+			$result=json_decode($status);
+			if($result->status=='error')			
+				echo $result->message;
 			else
-				print_r($status);
-
+				echo "Status: ".$result->status."<br/> Message: ".$result->message." </br> Error: ".$result->error;	
 
 		}
 		
-			$this->render('details');
+		$this->render('details');
 	}
 
 	public function actionAddmount()
 	{
 		if(isset($_POST['publisher_id']))
 		{
-			$book=Book::model()->findAllByAttributes(array('publisher_id'=>'17','isCompleted'=>'1','sendtoMountcart'=>'0'));
+			$publisher_id=$_POST['publisher_id'];
+			$book=Book::model()->findAllByAttributes(array('publisher_id'=>$publisher_id,'isCompleted'=>'1','sendtoMountcart'=>'0','stock_status'=>'1'));
 			if(!empty($book))
 			{	
 		        $results = array();
@@ -223,15 +228,12 @@ class ScrapformController extends Controller
         
 	}
 
+ /* Get all Gk Categories */
 
-	/* Get Gk publication Books */
-
-	public function actionGetgk()
+	public function actionGetgkcat()
 	{
 		$count=0;
-		//https://www.gkpublications.com/index.php?route=product/category&path=150_238
 		$url="https://www.gkpublications.com/index.php?route=product/category&path=150";
-		//$url = $url.$uri;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		$client = new Client();
 		$res = $client->request('GET', $url);
@@ -239,33 +241,26 @@ class ScrapformController extends Controller
 		$crawler = new Crawler($contents);
         $filter = $crawler->filter('div.tree-menu')->filter('ul.box-category')->filter('ul.accordion-body')->filter('li');
         //echo "<pre>",print_r($filter),"</pre>";exit;
-
+        
         try
         {
 	        foreach ($filter as $content) {
 	        	$crawler = new Crawler($content);
-	        	foreach($crawler as $sample)
-	        	echo "<pre>",print_r($sample),"</pre>";exit;
-	        	// $data=$crawler->filter('a')->html();
-	        	// echo $data."<br/>";
-	        	//$count++;
-	      //   	$count=Book::model()->countByAttributes(array("publisher_id"=>17));
-	      //   	$count++;
-	      //   	$book=new Book;
-	    		// $book->book_name = $crawler->filter('a.prdocutname')->html();
-	    		// $book->mrp = $crawler->filter('span.priceold')->html();
-	    		// $book->discount_price = $this->calculateDiscount($book->mrp);
-	    		// $book->book_url = $crawler->filter('a.prdocutname')->attr('href');
-	    		// $book->image_thumb_url = $crawler->filter('div.thumbnail > a > img')->attr('src');
-	    		// $book->publisher_id=$publisher_id;
-	    		// $book->category_id='1';
-	    		// $book->attribute=$attr;
-	    		// $book->product_id='ARIH'.($count);
-	    		// $nostock=$crawler->filter('span.nostock')->count();
-	    		// if($nostock==0)
-	    		// $valid=$book->save(false);	
+	        	foreach($crawler as $sample){
+	             $cat_name= $crawler->filter('a')->html();
+	             $cat_url= $crawler->filter('a')->attr('href');
+	             $category=new Category;
+	             $category->publisher_id=12;
+	             $category->category_name=$cat_name;
+	             $category->url=$cat_url;
+	             $category->save(false);
+	             $count++;
+	             echo $count;
+	             
+	        	}
+	        	if($count=="32")break;
+	        	
 	        }
-	        //echo "count=".$count;
 	        exit;
 	        if($valid)
          		return 'success'.$count; 
@@ -275,8 +270,133 @@ class ScrapformController extends Controller
             $result['status'] = 'failed';
             return $result;
         }
+	}
+
+	/* Get Gk publication Books */
+
+	public function getGk($publisher_id,$url,$uri,$attr,$mc_cat)
+	{
+		$count=0;
+		$url = $url."&".$uri;
+		$image_thumb_url=null;
+		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
+		
+        try
+        {
+        	$client = new Client();
+			$res = $client->request('GET', $url);
+			$contents=$res->getBody()->getContents();
+			$crawler = new Crawler($contents);
+	        $filter = $crawler->filter('div.products-row')->filter('div.item-full');
+
+	        foreach ($filter as $content) {
+	        	$crawler = new Crawler($content);
+	        	$product_id_count=Book::model()->countByAttributes(array("publisher_id"=>12));
+	    		$product_id_count++;
+	        	$book=new Book;
+	        	$book_name = $crawler->filter('div.product-meta')->filter('h3')->filter('a')->html();
+	    		$mrp =$crawler->filter('div.product-meta')->filter('span.price-new')->html();
+	    		$book_url = $crawler->filter('div.product-meta')->filter('h3')->filter('a')->attr('href');
+	    		if($crawler->filter('div.image > a > img')->count()){
+	    			$image_thumb_url=$crawler->filter('div.image > a > img')->attr('src');
+	    		}
+	    		
+	    		$book->book_name = $book_name;
+    			$book->mrp = $mrp;
+    			$book->discount_price = $this->calculateDiscount($book->mrp);
+    			$book->book_url = $book_url;
+    			$book->image_thumb_url = $image_thumb_url;
+	    		$book->publisher_id=$publisher_id;
+	    		$book->attribute=$attr;
+	    		$book->product_id='GKPU'.($product_id_count);
+	    		$book->mc_categories=$mc_cat;
+	    		$book->author='GKP';
+	    		$book->edition='2017';
+	    		$valid=$book->save(false);
+	    		
+	    		if($valid){
+	    			$count++;
+	            	echo 'Completed '.$count.' record'."</br>";	
+	       		}
+
+	       		$result['status'] = 'success';
+	            $result['message'] = 'Completed '.$count.' records';
+	            $result['error'] ='no';  
+	        }
+	         	return json_encode($result); 
+    	}	
+        catch(\Exception $e) {
+            $result['status'] = 'failed';
+            $result['message'] =$e->getMessage();
+            $result['error']='Failed at '.++$count.' record';
+            return json_encode($result);
+        }
        
 	}
+
+	/* Get GK Details */
+
+	public function getGkDetails($publisher_id)
+	{
+		
+		$result=array();
+		$count=0;
+		$book=Book::model()->findAllByAttributes(array('publisher_id'=>$publisher_id,'isCompleted'=>'0'));
+		try
+		{	
+			 if(!empty($book))
+			 {
+				 foreach($book as $book_data)
+				 {
+					$url = $book_data->book_url;
+					$client = new Client();
+					$res = $client->request('GET', $url);
+					$contents=$res->getBody()->getContents();
+					$crawler = new Crawler($contents);
+			        $isbn=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled > li')->last()->html();
+			        $book_data->isbn=$this->filter_number($isbn);
+			        $stock=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled')->eq(2)->html();
+			        if(0 === preg_match('~[0-9]~', $stock)){
+    					$book_data->stock_status='0';
+					}
+			        $description=$crawler->filter('div.product-info')->filter('div#tab-description')->html();
+			        $book_data->description=$description;
+			        $book_data->image_main_url=$book_data->image_thumb_url;
+			        $book_data->isCompleted=1;
+			  		$valid=$book_data->save(false);
+			  		if($valid){
+		    			$count++;
+		            	echo 'Completed '.$count.' record'."</br>";	
+	       			}
+		       		$result['status'] = 'success';
+		            $result['message'] = 'Completed '.$count.' records';
+		            $result['error'] ='no';  
+				}
+				return json_encode($result);
+			 }
+			 else
+			 {
+			 	$result['status'] = 'error';
+			 	$result['message'] = 'No More books to fetch';
+		        $result['error'] ='no';
+			 	return json_encode($result);
+			 }
+
+
+		}
+		catch(\Exception $e) {
+            $result['status'] = 'failed';
+            $result['message'] =$e->getMessage();
+            $result['error']='Failed at '.++$count.' record';
+            return json_encode($result);
+        }
+        
+	}
+
+
+
+
+
 
 	/* Pushing the data to mountcart database */
 
@@ -296,7 +416,7 @@ class ScrapformController extends Controller
                 'quantity' => $quantity,
                 'stock_status_id' => $stock_status,
                 'image' => $imageFile,
-                'manufacturer_id' => 17,
+                'manufacturer_id' => $data['publisher_id'],
                 'price' =>$this->filter_number_from_string($data['mrp']),
                 'cost' => 0,
                 'edit' => $data['edition'],
@@ -314,6 +434,7 @@ class ScrapformController extends Controller
                 'status' => $status,
                 'date_added' => new CDbExpression('NOW()'),
                 'date_modified' => new CDbExpression('NOW()'),
+
             ));
             //var_dump(debug_backtrace());exit;
             $result['oc_product_status'] = 'Success';
@@ -398,9 +519,10 @@ class ScrapformController extends Controller
         //{
         //$destdir = '/var/www/mountcart/image/data/';
         //$destdir = "/home/mountcart12/www/image/data/";
-        	$link='https:'.$book['image_main_url'];
-	        //$destdir = "/var/www/html/mcscrap/image/data/";
-	        $destdir = "/home/mynewmountcart/www/image/data/";
+        	//$link='https:'.$book['image_main_url'];
+        	$link=$book['image_main_url'];
+	        $destdir = "/var/www/html/mcscrap/image/data/";
+	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        $extension = pathinfo($link, PATHINFO_EXTENSION);
 	        $img=file_get_contents($link);
 	        $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
@@ -448,14 +570,17 @@ class ScrapformController extends Controller
      } 
 	
 	private function filter_number_from_string($string) {
-        //$string = strtolower($string);
-       	preg_match_all('!\d+!', $string, $matches);
-        //$string = preg_replace('/[a-z.]/', '', $string);
-        return implode("",$matches[0]);
+       //preg_match_all('!\d+!', $string, $matches);
+		$matches=explode(".",$string);
+        return $matches[1];
     }
 
     private function roundUpToAny($n,$x=5,$y=10) {
         return (round($n)%$y <= 2) ? round($n / $y) * $y : round($n / $x ) * $x;
+    }
+
+    private function filter_number($string){
+    	return filter_var($string, FILTER_SANITIZE_NUMBER_INT);
     }
 
     public function setPushSuccess($id) {
@@ -467,11 +592,21 @@ class ScrapformController extends Controller
 
     public function actionTest()
     {
+    	$string="Availability 567567567567";
+    	//echo preg_match('~[0-9]~', $string);exit;
     	
-    	$str="Rs.155000";
-    	preg_match_all('!\d+!', $str, $matches);
-    	print_r($matches[0]);
-    	echo implode("",$matches[0]);
+    	if(0 === preg_match('~[0-9]~', $string)){
+    		echo "only string";
+		}
+		else{
+			echo "has number";
+		}
+    	
+    	// $str="Rs.675.00";
+    	// $mrp = $this->filter_number_from_string($str);
+    	// $processValue=$this->processDiscount($mrp);
+     // 	$discPrice=(110-50)/100 * $mrp + $processValue;
+     // 	echo $this->roundUpToAny($discPrice);
     }
 
 	/**
@@ -503,13 +638,13 @@ class ScrapformController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id)
+	public function actionDeleteAll()
 	{
-		$this->loadModel($id)->delete();
-
+		//$this->loadModel($id)->delete();
+		Book::model()->deleteAll();
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+		//if(!isset($_GET['ajax']))
+			//$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
 	}
 
 	/**

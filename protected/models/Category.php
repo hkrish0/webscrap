@@ -1,24 +1,22 @@
 <?php
 
 /**
- * This is the model class for table "publisher".
+ * This is the model class for table "category".
  *
- * The followings are the available columns in table 'publisher':
+ * The followings are the available columns in table 'category':
  * @property integer $id
- * @property string $publisher_name
- * @property string $function_name
- * @property string $function_name_other
+ * @property integer $publisher_id
+ * @property string $category_name
  * @property string $url
- * @property string $uri
  */
-class Publisher extends CActiveRecord
+class Category extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'publisher';
+		return 'category';
 	}
 
 	/**
@@ -29,15 +27,12 @@ class Publisher extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, publisher_name, function_name, function_name_other', 'required'),
-			array('id', 'numerical', 'integerOnly'=>true),
-			array('publisher_name', 'length', 'max'=>100),
-			array('function_name', 'length', 'max'=>50),
-			array('function_name_other', 'length', 'max'=>40),
-			array('url, uri', 'safe'),
+			array('category_name, url', 'required'),
+			array('publisher_id', 'numerical', 'integerOnly'=>true),
+			array('category_name', 'length', 'max'=>100),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, publisher_name, function_name, function_name_other, url, uri', 'safe', 'on'=>'search'),
+			array('id, publisher_id, category_name, url', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -59,11 +54,9 @@ class Publisher extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'publisher_name' => 'Publisher Name',
-			'function_name' => 'Function Name',
-			'function_name_other' => 'Function Name Other',
+			'publisher_id' => 'Publisher',
+			'category_name' => 'Category Name',
 			'url' => 'Url',
-			'uri' => 'Uri',
 		);
 	}
 
@@ -86,11 +79,9 @@ class Publisher extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('publisher_name',$this->publisher_name,true);
-		$criteria->compare('function_name',$this->function_name,true);
-		$criteria->compare('function_name_other',$this->function_name_other,true);
+		$criteria->compare('publisher_id',$this->publisher_id);
+		$criteria->compare('category_name',$this->category_name,true);
 		$criteria->compare('url',$this->url,true);
-		$criteria->compare('uri',$this->uri,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -101,7 +92,7 @@ class Publisher extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return Publisher the static model class
+	 * @return Category the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

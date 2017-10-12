@@ -5,9 +5,9 @@
  *
  * The followings are the available columns in table 'category_details':
  * @property integer $id
- * @property string $category_name
  * @property integer $category_id
- * @property string $url
+ * @property string $attribute
+ * @property integer $mount_cat_id
  */
 class CategoryDetails extends CActiveRecord
 {
@@ -27,12 +27,11 @@ class CategoryDetails extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('category_id', 'numerical', 'integerOnly'=>true),
-			array('category_name', 'length', 'max'=>100),
-			array('url', 'safe'),
+			array('category_id, mount_cat_id', 'numerical', 'integerOnly'=>true),
+			array('attribute', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, category_name, category_id, url', 'safe', 'on'=>'search'),
+			array('id, category_id, attribute, mount_cat_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,9 +53,9 @@ class CategoryDetails extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'category_name' => 'Category Name',
 			'category_id' => 'Category',
-			'url' => 'Url',
+			'attribute' => 'Attribute',
+			'mount_cat_id' => 'Mount Cat',
 		);
 	}
 
@@ -79,9 +78,9 @@ class CategoryDetails extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('category_name',$this->category_name,true);
 		$criteria->compare('category_id',$this->category_id);
-		$criteria->compare('url',$this->url,true);
+		$criteria->compare('attribute',$this->attribute,true);
+		$criteria->compare('mount_cat_id',$this->mount_cat_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

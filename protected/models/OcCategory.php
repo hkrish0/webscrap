@@ -1,24 +1,27 @@
 <?php
 
 /**
- * This is the model class for table "publisher".
+ * This is the model class for table "oc_category".
  *
- * The followings are the available columns in table 'publisher':
- * @property integer $id
- * @property string $publisher_name
- * @property string $function_name
- * @property string $function_name_other
- * @property string $url
- * @property string $uri
+ * The followings are the available columns in table 'oc_category':
+ * @property integer $category_id
+ * @property string $image
+ * @property integer $parent_id
+ * @property integer $top
+ * @property integer $column
+ * @property integer $sort_order
+ * @property integer $status
+ * @property string $date_added
+ * @property string $date_modified
  */
-class Publisher extends CActiveRecord
+class OcCategory extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'publisher';
+		return 'oc_category';
 	}
 
 	/**
@@ -29,15 +32,13 @@ class Publisher extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, publisher_name, function_name, function_name_other', 'required'),
-			array('id', 'numerical', 'integerOnly'=>true),
-			array('publisher_name', 'length', 'max'=>100),
-			array('function_name', 'length', 'max'=>50),
-			array('function_name_other', 'length', 'max'=>40),
-			array('url, uri', 'safe'),
+			array('top, column, status', 'required'),
+			array('parent_id, top, column, sort_order, status', 'numerical', 'integerOnly'=>true),
+			array('image', 'length', 'max'=>255),
+			array('date_added, date_modified', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, publisher_name, function_name, function_name_other, url, uri', 'safe', 'on'=>'search'),
+			array('category_id, image, parent_id, top, column, sort_order, status, date_added, date_modified', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,12 +59,15 @@ class Publisher extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'publisher_name' => 'Publisher Name',
-			'function_name' => 'Function Name',
-			'function_name_other' => 'Function Name Other',
-			'url' => 'Url',
-			'uri' => 'Uri',
+			'category_id' => 'Category',
+			'image' => 'Image',
+			'parent_id' => 'Parent',
+			'top' => 'Top',
+			'column' => 'Column',
+			'sort_order' => 'Sort Order',
+			'status' => 'Status',
+			'date_added' => 'Date Added',
+			'date_modified' => 'Date Modified',
 		);
 	}
 
@@ -85,12 +89,15 @@ class Publisher extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('publisher_name',$this->publisher_name,true);
-		$criteria->compare('function_name',$this->function_name,true);
-		$criteria->compare('function_name_other',$this->function_name_other,true);
-		$criteria->compare('url',$this->url,true);
-		$criteria->compare('uri',$this->uri,true);
+		$criteria->compare('category_id',$this->category_id);
+		$criteria->compare('image',$this->image,true);
+		$criteria->compare('parent_id',$this->parent_id);
+		$criteria->compare('top',$this->top);
+		$criteria->compare('column',$this->column);
+		$criteria->compare('sort_order',$this->sort_order);
+		$criteria->compare('status',$this->status);
+		$criteria->compare('date_added',$this->date_added,true);
+		$criteria->compare('date_modified',$this->date_modified,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -101,7 +108,7 @@ class Publisher extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return Publisher the static model class
+	 * @return OcCategory the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

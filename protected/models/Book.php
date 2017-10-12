@@ -9,7 +9,6 @@
  * @property string $product_id
  * @property string $book_url
  * @property string $author
- * @property string $publisher
  * @property string $language
  * @property string $mrp
  * @property string $discount_price
@@ -31,6 +30,7 @@
  * @property integer $publisher_id
  * @property string $isCompleted
  * @property string $sendtoMountcart
+ * @property string $date_added
  */
 class Book extends CActiveRecord
 {
@@ -50,21 +50,21 @@ class Book extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('book_name, book_url, category_id, attribute', 'required'),
+			array('book_name, book_url, attribute', 'required'),
 			array('length, width, height, weight, category_id, publisher_id', 'numerical', 'integerOnly'=>true),
 			array('product_id, language, binding, mc_categories', 'length', 'max'=>50),
 			array('author', 'length', 'max'=>100),
-			array('publisher', 'length', 'max'=>150),
-			array('mrp, discount_price, isbn', 'length', 'max'=>15),
+			array('mrp, discount_price', 'length', 'max'=>15),
+			array('isbn', 'length', 'max'=>70),
 			array('edition, pages', 'length', 'max'=>10),
 			array('stock_status', 'length', 'max'=>20),
 			array('attribute', 'length', 'max'=>60),
 			array('isCompleted', 'length', 'max'=>2),
 			array('sendtoMountcart', 'length', 'max'=>5),
-			array('description, image_main_url, image_thumb_url', 'safe'),
+			array('description, image_main_url, image_thumb_url, date_added', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, book_name, product_id, book_url, author, publisher, language, mrp, discount_price, isbn, edition, stock_status, pages, length, width, height, weight, binding, description, image_main_url, image_thumb_url, category_id, attribute, mc_categories, publisher_id, isCompleted, sendtoMountcart', 'safe', 'on'=>'search'),
+			array('id, book_name, product_id, book_url, author, language, mrp, discount_price, isbn, edition, stock_status, pages, length, width, height, weight, binding, description, image_main_url, image_thumb_url, category_id, attribute, mc_categories, publisher_id, isCompleted, sendtoMountcart, date_added', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -90,7 +90,6 @@ class Book extends CActiveRecord
 			'product_id' => 'Product',
 			'book_url' => 'Book Url',
 			'author' => 'Author',
-			'publisher' => 'Publisher',
 			'language' => 'Language',
 			'mrp' => 'Mrp',
 			'discount_price' => 'Discount Price',
@@ -112,6 +111,7 @@ class Book extends CActiveRecord
 			'publisher_id' => 'Publisher',
 			'isCompleted' => 'Is Completed',
 			'sendtoMountcart' => 'Sendto Mountcart',
+			'date_added' => 'Date Added',
 		);
 	}
 
@@ -138,7 +138,6 @@ class Book extends CActiveRecord
 		$criteria->compare('product_id',$this->product_id,true);
 		$criteria->compare('book_url',$this->book_url,true);
 		$criteria->compare('author',$this->author,true);
-		$criteria->compare('publisher',$this->publisher,true);
 		$criteria->compare('language',$this->language,true);
 		$criteria->compare('mrp',$this->mrp,true);
 		$criteria->compare('discount_price',$this->discount_price,true);
@@ -160,6 +159,7 @@ class Book extends CActiveRecord
 		$criteria->compare('publisher_id',$this->publisher_id);
 		$criteria->compare('isCompleted',$this->isCompleted,true);
 		$criteria->compare('sendtoMountcart',$this->sendtoMountcart,true);
+		$criteria->compare('date_added',$this->date_added,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
