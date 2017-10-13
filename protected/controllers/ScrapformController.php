@@ -68,11 +68,25 @@ class ScrapformController extends Controller
 		if(isset($_POST['Scrapform']))
 		{
 			$model->attributes=$_POST['Scrapform'];
+			//print_r($model->attributes);exit;
 			$publisher_id=$model->publisher_id;
 			$publisher=Publisher::model()->findByPk($publisher_id);
 			$publisher_function=$publisher->function_name;
-			$url=$model->url;
-			$uri=$publisher->uri;
+
+			if(empty($model->url)){
+				$url=$publisher->url;
+			}
+			else{
+				$url=$model->url;
+			}
+			if(empty($publisher->uri)){
+				$uri=$model->uri;
+			}
+			else{
+				$uri=$publisher->uri;
+			}
+			
+			
 			$attr=$model->attribute;
 			$mountcart_categories=json_encode($_POST['Scrapform']['mount_categories']);
 			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories);
@@ -139,7 +153,7 @@ class ScrapformController extends Controller
 
 	public function getArihant($publisher_id,$url,$uri,$attr)
 	{
-		
+		$count=0;
 		$url = $url.$uri;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		$client = new Client();
@@ -152,8 +166,8 @@ class ScrapformController extends Controller
         {
 	        foreach ($filter as $content) {
 	        	$crawler = new Crawler($content);
-	        	$count=Book::model()->countByAttributes(array("publisher_id"=>17));
-	        	$count++;
+	        	$product_id_count=Book::model()->countByAttributes(array("publisher_id"=>17));
+	        	$product_id_count++;
 	        	$book=new Book;
 	    		$book->book_name = $crawler->filter('a.prdocutname')->html();
 	    		$book->mrp = $crawler->filter('span.priceold')->html();
@@ -163,18 +177,30 @@ class ScrapformController extends Controller
 	    		$book->publisher_id=$publisher_id;
 	    		$book->category_id='1';
 	    		$book->attribute=$attr;
-	    		$book->product_id='ARIH'.($count);
+	    		$book->date_added=date('Y-m-d H:i:s');
+	    		$book->product_id='ARIH'.($product_id_count);
 	    		$nostock=$crawler->filter('span.nostock')->count();
-	    		if($nostock==0)
+	    		if($nostock>0){
+	    			$book->stock_status=0;
+	    		}
 	    		$valid=$book->save(false);	
+	    		if($valid){
+	    			$count++;
+	            	echo 'Completed '.$count.' record'."</br>";	
+	       		}
+
+	       		$result['status'] = 'success';
+	            $result['message'] = 'Completed '.$count.' records';
+	            $result['error'] ='no';  
 	        }
-	        if($valid)
-         		return 'success'.$count; 
+	        return json_encode($result);
+	        
     	}	
         catch(\Exception $e) {
-            echo $e->getMessage();
             $result['status'] = 'failed';
-            return $result;
+            $result['message'] =$e->getMessage();
+            $result['error']='Failed at '.++$count.' record';
+            return json_encode($result);
         }
        
 	}
@@ -184,6 +210,7 @@ class ScrapformController extends Controller
 	public function getArihantdetails($publisher_id)
 	{
 		$result=array();
+		$count=0;
 		$mc_categories=array('main'=>105,'sub'=>207);
 		$book=Book::model()->findAllByAttributes(array('publisher_id'=>$publisher_id,'isCompleted'=>'0'));
 		try
@@ -209,21 +236,31 @@ class ScrapformController extends Controller
 			        $book_data->description=$crawler->filter('div.descrition')->filter('div.row')->filter('div.productinforight')->last()->html();
 			        $book_data->isCompleted=1;
 			  		$valid=$book_data->save(false);
+			  		if($valid){
+		    			$count++;
+		            	echo 'Completed '.$count.' record'."</br>";	
+	       			}
+		       		$result['status'] = 'success';
+		            $result['message'] = 'Completed '.$count.' records';
+		            $result['error'] ='no';  
 				}
-				if($valid)
-					return 'successs';
+					return json_encode($result);
 			}
 			else
 			{
-				return 'error';
+				$result['status'] = 'error';
+			 	$result['message'] = 'No More books to fetch';
+		        $result['error'] ='no';
+			 	return json_encode($result);
 			}
 
 
 		}
 		catch(\Exception $e) {
-            echo $e->getMessage();
             $result['status'] = 'failed';
-            return $result;
+            $result['message'] =$e->getMessage();
+            $result['error']='Failed at '.++$count.' record';
+            return json_encode($result);
         }
         
 	}
@@ -278,6 +315,7 @@ class ScrapformController extends Controller
 	{
 		$count=0;
 		$url = $url."&".$uri;
+		echo $url;exit;
 		$image_thumb_url=null;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		
@@ -423,7 +461,7 @@ class ScrapformController extends Controller
                 'sku' => '',
                 'upc' => '',
                 'ean' => isset($data['language']) ? $data['language'] : "English",
-                'jan' => '',
+                'jan' => $data['pages'],
                 'mpn' => '',
                 'location' => '',
                 'tax_class_id' => 0,
@@ -519,8 +557,8 @@ class ScrapformController extends Controller
         //{
         //$destdir = '/var/www/mountcart/image/data/';
         //$destdir = "/home/mountcart12/www/image/data/";
-        	//$link='https:'.$book['image_main_url'];
-        	$link=$book['image_main_url'];
+        	$link='https:'.$book['image_main_url'];
+        	//$link=$book['image_main_url'];
 	        //$destdir = "/var/www/html/mcscrap/image/data/";
 	        $destdir = "/home/mynewmountcart/www/image/data/";
 	        $extension = pathinfo($link, PATHINFO_EXTENSION);
@@ -536,36 +574,36 @@ class ScrapformController extends Controller
      {
         
         if($mrp < 300) {
-            return 30;
+            return 20;
         }
 
         if($mrp > 300 && $mrp < 500) {
-            return 50;
+            return 40;
         }
 
         if($mrp > 500 && $mrp < 700) {
-            return 70;
+            return 60;
         }
 
         if($mrp > 700 && $mrp < 900) {
-            return 90;
+            return 80;
         }
 
         if($mrp > 900 && $mrp < 1000) {
-            return 110;
+            return 100;
         }
 
         if($mrp > 1000) {
-            return 140;
+            return 130;
         }
     }
 
      private function calculateDiscount($mrp)
      {
-     	$x=50;
+     	$x=50;$y=110;
      	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
-     	$discPrice=(100-$x)/100 * $mrp + $processValue;
+     	$discPrice=($y-$x)/100 * $mrp + $processValue;
      	return $this->roundUpToAny($discPrice);
      } 
 	

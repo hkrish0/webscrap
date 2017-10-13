@@ -30,9 +30,10 @@ class Scrapform extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('publisher_id, url', 'required'),
+			array('publisher_id', 'required'),
 			array('publisher_id', 'numerical', 'integerOnly'=>true),
 			array('uri, attribute', 'length', 'max'=>100),
+			array('url', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, publisher_id, url, uri, attribute', 'safe', 'on'=>'search'),
