@@ -151,7 +151,7 @@ class ScrapformController extends Controller
 
 	/*Get Arihant Books */
 
-	public function getArihant($publisher_id,$url,$uri,$attr)
+	public function getArihant($publisher_id,$url,$uri,$attr,$mc_cat)
 	{
 		$count=0;
 		$url = $url.$uri;
@@ -178,6 +178,7 @@ class ScrapformController extends Controller
 	    		$book->category_id='1';
 	    		$book->attribute=$attr;
 	    		$book->date_added=date('Y-m-d H:i:s');
+	    		$book->mc_categories=$mc_cat;
 	    		$book->product_id='ARIH'.($product_id_count);
 	    		$nostock=$crawler->filter('span.nostock')->count();
 	    		if($nostock>0){
@@ -211,7 +212,7 @@ class ScrapformController extends Controller
 	{
 		$result=array();
 		$count=0;
-		$mc_categories=array('main'=>105,'sub'=>207);
+		//$mc_categories=array('main'=>105,'sub'=>207);
 		$book=Book::model()->findAllByAttributes(array('publisher_id'=>$publisher_id,'isCompleted'=>'0'));
 		try
 		{	
@@ -232,7 +233,7 @@ class ScrapformController extends Controller
 			        $book_data->binding=$crawler->filter('div.speci-box')->filter('div.row')->filter('div.col-xs-8')->eq(6)->html();
 			        $book_data->pages=$crawler->filter('div.speci-box')->filter('div.row')->filter('div.col-xs-8')->last()->html();
 			        $book_data->image_main_url=$crawler->filter('div.mainimage > img')->attr('src');
-			        $book_data->mc_categories=json_encode($mc_categories);
+			        //$book_data->mc_categories=json_encode($mc_categories);
 			        $book_data->description=$crawler->filter('div.descrition')->filter('div.row')->filter('div.productinforight')->last()->html();
 			        $book_data->isCompleted=1;
 			  		$valid=$book_data->save(false);
