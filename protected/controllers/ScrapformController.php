@@ -565,7 +565,7 @@ class ScrapformController extends Controller
      	$x=50;
      	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
-     	$discPrice=(110-$x)/100 * $mrp + $processValue;
+     	$discPrice=(100-$x)/100 * $mrp + $processValue;
      	return $this->roundUpToAny($discPrice);
      } 
 	
