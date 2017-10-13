@@ -600,7 +600,7 @@ class ScrapformController extends Controller
 
      private function calculateDiscount($mrp)
      {
-     	$x=50;$y=110;
+     	$x=50;$y=120;
      	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
      	$discPrice=($y-$x)/100 * $mrp + $processValue;
