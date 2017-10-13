@@ -608,9 +608,11 @@ class ScrapformController extends Controller
      } 
 	
 	private function filter_number_from_string($string) {
-       //preg_match_all('!\d+!', $string, $matches);
-		$matches=explode(".",$string);
-        return $matches[1];
+		
+       preg_match_all('!\d+!', $string, $matches);
+       return implode("",$matches[0]);
+		//$matches=explode(".",$string);
+        //return $matches;
     }
 
     private function roundUpToAny($n,$x=5,$y=10) {
@@ -630,15 +632,19 @@ class ScrapformController extends Controller
 
     public function actionTest()
     {
-    	$string="Availability 567567567567";
+
+    	$string="Rs.1,265";
+    	$dd=$this->filter_number_from_string($string);
+    	print_r($dd);exit;
+    	//$string="Availability 567567567567";
     	//echo preg_match('~[0-9]~', $string);exit;
     	
-    	if(0 === preg_match('~[0-9]~', $string)){
-    		echo "only string";
-		}
-		else{
-			echo "has number";
-		}
+  //   	if(0 === preg_match('~[0-9]~', $string)){
+  //   		echo "only string";
+		// }
+		// else{
+		// 	echo "has number";
+		// }
     	
     	// $str="Rs.675.00";
     	// $mrp = $this->filter_number_from_string($str);
