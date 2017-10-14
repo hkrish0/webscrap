@@ -48,7 +48,7 @@
 	    'options'=>array(),
 	)); ?>
 
-
+	
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'url'); ?>

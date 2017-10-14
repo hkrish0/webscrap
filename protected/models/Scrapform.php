@@ -17,6 +17,8 @@ class Scrapform extends CActiveRecord
 	 */
 	public $publisher_cat;
 	public $mount_categories;
+	public $discount_x;
+	public $discount_y;
 	public function tableName()
 	{
 		return 'scrapform';

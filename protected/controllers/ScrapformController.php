@@ -86,7 +86,6 @@ class ScrapformController extends Controller
 				$uri=$publisher->uri;
 			}
 			
-			
 			$attr=$model->attribute;
 			$mountcart_categories=json_encode($_POST['Scrapform']['mount_categories']);
 			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories);
@@ -601,7 +600,7 @@ class ScrapformController extends Controller
 
      private function calculateDiscount($mrp)
      {
-     	$x=52;$y=110;
+     	$x=45;y=110;
      	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
      	$discPrice=($y-$x)/100 * $mrp + $processValue;
