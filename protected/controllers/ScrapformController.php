@@ -559,10 +559,10 @@ class ScrapformController extends Controller
         //$destdir = "/home/mountcart12/www/image/data/";
         //$link='https:'.$book['image_main_url'];
         	$link=$book['image_main_url'];
-        	if (!file_exists('/var/www/html/mcscrap/image/tmp/')) {
-    			mkdir('/var/www/html/mcscrap/image/tmp/', 0777, true);
+        	if (!file_exists('/home/mynewmountcart/www/image/tmp/')) {
+    			mkdir('/home/mynewmountcart/www/image/tmp/', 0777, true);
 			}
-        	$destdir = "/var/www/html/mcscrap/image/tmp/";
+        	$destdir = "/home/mynewmountcart/www/image/tmp/";
 	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        
 	         $extension = pathinfo($link, PATHINFO_EXTENSION);
@@ -570,10 +570,10 @@ class ScrapformController extends Controller
 	         $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
 	         file_put_contents($destdir.$saveFileName, $img);
 
-	         $destdir1="/var/www/html/mcscrap/image/data/".$saveFileName;
-	         $source_photo="/var/www/html/mcscrap/image/tmp/".$saveFileName;
+	         $destdir1="/home/mynewmountcart/www/image/data/".$saveFileName;
+	         $source_photo="/home/mynewmountcart/www/image/tmp/".$saveFileName;
 	         $d = $this->compress_image($source_photo, $destdir1, 30);
-	         $this->deleteDirectory("/var/www/html/mcscrap/image/tmp/");
+	         $this->deleteDirectory("/home/mynewmountcart/www/image/tmp/");
 
 	         return 'data/'.$saveFileName;
     	//}
