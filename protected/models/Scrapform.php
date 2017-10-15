@@ -15,6 +15,14 @@ class Scrapform extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+
+
+	const STATUS_SUCCESS = 'Success';
+	const STATUS_ERROR = 'Failed';
+	const STOCK_STATUS_IN='1';
+	const STOCK_STATUS_OUT='0';
+	const SUCCESS_MESSAGE_TEXT='No More books to fetch';
+
 	public $publisher_cat;
 	public $mount_categories;
 	public $discount_x;

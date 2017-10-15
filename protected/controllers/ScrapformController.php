@@ -68,34 +68,30 @@ class ScrapformController extends Controller
 		if(isset($_POST['Scrapform']))
 		{
 			$model->attributes=$_POST['Scrapform'];
-			//print_r($model->attributes);exit;
 			$publisher_id=$model->publisher_id;
 			$publisher=Publisher::model()->findByPk($publisher_id);
-			$publisher_function=$publisher->function_name;
-
-			if(empty($model->url)){
-				$url=$publisher->url;
-			}
-			else{
-				$url=$model->url;
-			}
-			if(empty($publisher->uri)){
-				$uri=$model->uri;
-			}
-			else{
-				$uri=$publisher->uri;
-			}
-			
 			$attr=$model->attribute;
+			$url = (empty($model->url) ? $publisher->url : $model->url);
+			$uri = (empty($publisher->uri) ? $model->uri : $publisher->uri);
 			$mountcart_categories=json_encode($_POST['Scrapform']['mount_categories']);
+			$publisher_function=$publisher->function_name;
 			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories);
+			
 			$result=json_decode($status);
-			echo "Status: ".$result->status."<br/> Message: ".$result->message." </br> Error: ".$result->error;	
-		}
 
+			if($result->status==Scrapform::STATUS_SUCCESS){
+				echo "Status : ".$result->status."<br/> Inserted : ".$result->inserted." </br>Out of Stock : ".$result->OutStock;
+			}
+			else
+			{
+				echo "Status : ".$result->status."<br/> Message : ".$result->message." <br/>Error : ".$result->error;
+			}
+				
+		}
 		$this->render('create',array(
 			'model'=>$model,
 		));
+			
 	}
 
 	public function actionDetails()
@@ -110,7 +106,7 @@ class ScrapformController extends Controller
 			if($result->status=='error')			
 				echo $result->message;
 			else
-				echo "Status: ".$result->status."<br/> Message: ".$result->message." </br> Error: ".$result->error;	
+				echo "Status : ".$result->status."<br/> Message : ".$result->message." </br> Error : ".$result->error;	
 
 		}
 		
@@ -153,6 +149,7 @@ class ScrapformController extends Controller
 	public function getArihant($publisher_id,$url,$uri,$attr,$mc_cat)
 	{
 		$count=0;
+		$stock_count=0;
 		$url = $url.$uri;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		$client = new Client();
@@ -165,39 +162,42 @@ class ScrapformController extends Controller
         {
 	        foreach ($filter as $content) {
 	        	$crawler = new Crawler($content);
-	        	$product_id_count=Book::model()->countByAttributes(array("publisher_id"=>17));
-	        	$product_id_count++;
-	        	$book=new Book;
-	    		$book->book_name = $crawler->filter('a.prdocutname')->html();
-	    		$book->mrp = $crawler->filter('span.priceold')->html();
-	    		$book->discount_price = $this->calculateDiscount($book->mrp);
-	    		$book->book_url = $crawler->filter('a.prdocutname')->attr('href');
-	    		$book->image_thumb_url = $crawler->filter('div.thumbnail > a > img')->attr('src');
-	    		$book->publisher_id=$publisher_id;
-	    		$book->category_id='1';
-	    		$book->attribute=$attr;
-	    		$book->date_added=date('Y-m-d H:i:s');
-	    		$book->mc_categories=$mc_cat;
-	    		$book->product_id='ARIH'.($product_id_count);
-	    		$nostock=$crawler->filter('span.nostock')->count();
-	    		if($nostock>0){
-	    			$book->stock_status=0;
+	        	$nostock=$crawler->filter('span.nostock')->count();
+	        	if($nostock==Scrapform::STOCK_STATUS_OUT){
+		        	$product_id_count=Book::model()->countByAttributes(array("publisher_id"=>$publisher_id));
+		        	$product_id_count++;
+		        	$book=new Book;
+		    		$book->book_name = $crawler->filter('a.prdocutname')->html();
+		    		$book->mrp = $crawler->filter('span.priceold')->html();
+		    		$book->discount_price = $this->calculateDiscount($book->mrp);
+		    		$book->book_url = $crawler->filter('a.prdocutname')->attr('href');
+		    		$book->image_thumb_url = $crawler->filter('div.thumbnail > a > img')->attr('src');
+		    		$book->publisher_id=$publisher_id;
+		    		$book->category_id='1';
+		    		$book->attribute=$attr;
+		    		$book->date_added=date('Y-m-d H:i:s');
+		    		$book->mc_categories=$mc_cat;
+		    		$book->product_id='ARIH'.($product_id_count);
+	    			$valid=$book->save(false);	
+	    			if($valid){
+		    			$count++;
+		            	echo 'Completed '.$count.' record'."</br>";	
+	       			}
 	    		}
-	    		$valid=$book->save(false);	
-	    		if($valid){
-	    			$count++;
-	            	echo 'Completed '.$count.' record'."</br>";	
-	       		}
-
-	       		$result['status'] = 'success';
-	            $result['message'] = 'Completed '.$count.' records';
-	            $result['error'] ='no';  
+	    		else
+	    		{
+	    			$stock_count++;
+	    		}
+	       		$result['status'] =Scrapform::STATUS_SUCCESS;
+        		$result['inserted']=$count.' Books';
+        		$result['OutStock']=$stock_count.' Books';
+	            $result['error'] ='no'; 
 	        }
 	        return json_encode($result);
 	        
     	}	
         catch(\Exception $e) {
-            $result['status'] = 'failed';
+            $result['status'] = Scrapform::STATUS_ERROR;
             $result['message'] =$e->getMessage();
             $result['error']='Failed at '.++$count.' record';
             return json_encode($result);
@@ -232,7 +232,6 @@ class ScrapformController extends Controller
 			        $book_data->binding=$crawler->filter('div.speci-box')->filter('div.row')->filter('div.col-xs-8')->eq(6)->html();
 			        $book_data->pages=$crawler->filter('div.speci-box')->filter('div.row')->filter('div.col-xs-8')->last()->html();
 			        $book_data->image_main_url=$crawler->filter('div.mainimage > img')->attr('src');
-			        //$book_data->mc_categories=json_encode($mc_categories);
 			        $book_data->description=$crawler->filter('div.descrition')->filter('div.row')->filter('div.productinforight')->last()->html();
 			        $book_data->isCompleted=1;
 			  		$valid=$book_data->save(false);
@@ -240,7 +239,7 @@ class ScrapformController extends Controller
 		    			$count++;
 		            	echo 'Completed '.$count.' record'."</br>";	
 	       			}
-		       		$result['status'] = 'success';
+		       		$result['status'] =  Scrapform::STATUS_SUCCESS;
 		            $result['message'] = 'Completed '.$count.' records';
 		            $result['error'] ='no';  
 				}
@@ -248,8 +247,8 @@ class ScrapformController extends Controller
 			}
 			else
 			{
-				$result['status'] = 'error';
-			 	$result['message'] = 'No More books to fetch';
+				$result['status'] = Scrapform::STATUS_ERROR;
+			 	$result['message'] = Scrapform::SUCCESS_MESSAGE_TEXT;
 		        $result['error'] ='no';
 			 	return json_encode($result);
 			}
@@ -257,7 +256,7 @@ class ScrapformController extends Controller
 
 		}
 		catch(\Exception $e) {
-            $result['status'] = 'failed';
+            $result['status'] = Scrapform::STATUS_ERROR;
             $result['message'] =$e->getMessage();
             $result['error']='Failed at '.++$count.' record';
             return json_encode($result);
@@ -314,10 +313,10 @@ class ScrapformController extends Controller
 	public function getGk($publisher_id,$url,$uri,$attr,$mc_cat)
 	{
 		$count=0;
+		$stock_count=0;
 		$url = $url."&".$uri;
-		echo $url;exit;
 		$image_thumb_url=null;
-		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
+		//$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		
         try
         {
@@ -332,39 +331,50 @@ class ScrapformController extends Controller
 	        	$product_id_count=Book::model()->countByAttributes(array("publisher_id"=>12));
 	    		$product_id_count++;
 	        	$book=new Book;
-	        	$book_name = $crawler->filter('div.product-meta')->filter('h3')->filter('a')->html();
-	    		$mrp =$crawler->filter('div.product-meta')->filter('span.price-new')->html();
 	    		$book_url = $crawler->filter('div.product-meta')->filter('h3')->filter('a')->attr('href');
-	    		if($crawler->filter('div.image > a > img')->count()){
-	    			$image_thumb_url=$crawler->filter('div.image > a > img')->attr('src');
-	    		}
-	    		
-	    		$book->book_name = $book_name;
-    			$book->mrp = $mrp;
-    			$book->discount_price = $this->calculateDiscount($book->mrp);
-    			$book->book_url = $book_url;
-    			$book->image_thumb_url = $image_thumb_url;
-	    		$book->publisher_id=$publisher_id;
-	    		$book->attribute=$attr;
-	    		$book->product_id='GKPU'.($product_id_count);
-	    		$book->mc_categories=$mc_cat;
-	    		$book->author='GKP';
-	    		$book->edition='2017';
-	    		$valid=$book->save(false);
-	    		
-	    		if($valid){
-	    			$count++;
-	            	echo 'Completed '.$count.' record'."</br>";	
-	       		}
+	    		$result_data=$this->getGkDetails($book_url);
+	    		$details=json_decode($result_data);
+    			if($details->stock_status){
+		    		$book_name = $crawler->filter('div.product-meta')->filter('h3')->filter('a')->html();
+		    		$mrp =$crawler->filter('div.product-meta')->filter('span.price-new')->html();
+		    		if($crawler->filter('div.image > a > img')->count()){
+		    			$image_thumb_url=$crawler->filter('div.image > a > img')->attr('src');
+		    		}
+		    		$book->book_name = $book_name;
+	    			$book->mrp = $mrp;
+	    			$book->discount_price = $this->calculateDiscount($book->mrp);
+	    			$book->book_url = $book_url;
+	    			$book->image_thumb_url = $image_thumb_url;
+	    			$book->image_main_url= $image_thumb_url;
+		    		$book->publisher_id=$publisher_id;
+		    		$book->attribute=$attr;
+		    		$book->product_id='GKPU'.($product_id_count);
+		    		$book->mc_categories=$mc_cat;
+		    		$book->author='GKP';
+		    		$book->edition='2017';
+		    		$book->isbn=$details->isbn;
+		    		$book->description=$details->description;
+		    		$book->isCompleted=1;
+		    		$valid=$book->save(false);
+		    		if($valid){
+		    			$count++;
+		            	echo 'Completed '.$count.' record'."</br>";	
+		       		}	  
+	        	}
+	        	else{
+	        		$stock_count++;
+	        	}
 
-	       		$result['status'] = 'success';
-	            $result['message'] = 'Completed '.$count.' records';
-	            $result['error'] ='no';  
+        		
 	        }
+	        	$result['status'] =Scrapform::STATUS_SUCCESS;
+        		$result['inserted']=$count.' Books';
+        		$result['OutStock']=$stock_count.' Books';
+	            $result['error'] ='no';
 	         	return json_encode($result); 
     	}	
         catch(\Exception $e) {
-            $result['status'] = 'failed';
+            $result['status'] = Scrapform::STATUS_ERROR;
             $result['message'] =$e->getMessage();
             $result['error']='Failed at '.++$count.' record';
             return json_encode($result);
@@ -374,67 +384,28 @@ class ScrapformController extends Controller
 
 	/* Get GK Details */
 
-	public function getGkDetails($publisher_id)
+	public function getGkDetails($url)
 	{
-		
 		$result=array();
 		$count=0;
-		$book=Book::model()->findAllByAttributes(array('publisher_id'=>$publisher_id,'isCompleted'=>'0'));
-		try
-		{	
-			 if(!empty($book))
-			 {
-				 foreach($book as $book_data)
-				 {
-					$url = $book_data->book_url;
-					$client = new Client();
-					$res = $client->request('GET', $url);
-					$contents=$res->getBody()->getContents();
-					$crawler = new Crawler($contents);
-			        $isbn=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled > li')->last()->html();
-			        $book_data->isbn=$this->filter_number($isbn);
-			        $stock=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled')->eq(2)->html();
-			        if(0 === preg_match('~[0-9]~', $stock)){
-    					$book_data->stock_status='0';
-					}
-			        $description=$crawler->filter('div.product-info')->filter('div#tab-description')->html();
-			        $book_data->description=$description;
-			        $book_data->image_main_url=$book_data->image_thumb_url;
-			        $book_data->isCompleted=1;
-			  		$valid=$book_data->save(false);
-			  		if($valid){
-		    			$count++;
-		            	echo 'Completed '.$count.' record'."</br>";	
-	       			}
-		       		$result['status'] = 'success';
-		            $result['message'] = 'Completed '.$count.' records';
-		            $result['error'] ='no';  
-				}
-				return json_encode($result);
-			 }
-			 else
-			 {
-			 	$result['status'] = 'error';
-			 	$result['message'] = 'No More books to fetch';
-		        $result['error'] ='no';
-			 	return json_encode($result);
-			 }
-
-
-		}
-		catch(\Exception $e) {
-            $result['status'] = 'failed';
-            $result['message'] =$e->getMessage();
-            $result['error']='Failed at '.++$count.' record';
-            return json_encode($result);
-        }
-        
+			$url = $url;
+			$client = new Client();
+			$res = $client->request('GET', $url);
+			$contents=$res->getBody()->getContents();
+			$crawler = new Crawler($contents);
+	        $stock=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled')->eq(2)->html();
+	        if(preg_match('~[0-9]~', $stock) > Scrapform::STOCK_STATUS_OUT){
+	        	$isbn=$crawler->filter('div.product-info')->filter('div.col-xs-12')->filter('ul.list-unstyled > li')->last()->html();
+	        	$description=$crawler->filter('div.product-info')->filter('div#tab-description')->html();
+	        	$result['stock_status']=Scrapform::STOCK_STATUS_IN;
+	        	$result['isbn'] =$this->filter_number($isbn);
+            	$result['description'] = $description;
+			}
+			else{
+				$result['stock_status']=Scrapform::STOCK_STATUS_OUT;	
+			}
+			return json_encode($result);
 	}
-
-
-
-
-
 
 	/* Pushing the data to mountcart database */
 
@@ -559,8 +530,8 @@ class ScrapformController extends Controller
         //$destdir = "/home/mountcart12/www/image/data/";
         	$link='https:'.$book['image_main_url'];
         	//$link=$book['image_main_url'];
-	        //$destdir = "/var/www/html/mcscrap/image/data/";
-	        $destdir = "/home/mynewmountcart/www/image/data/";
+	        $destdir = "/var/www/html/mcscrap/image/data/";
+	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        $extension = pathinfo($link, PATHINFO_EXTENSION);
 	        $img=file_get_contents($link);
 	        $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
@@ -603,16 +574,17 @@ class ScrapformController extends Controller
      	$x=45;$y=110;
      	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
-     	$discPrice=($y-$x)/100 * $mrp + $processValue;
-     	return $this->roundUpToAny($discPrice);
+     	$discPrice=(($y-$x)/100 * $mrp) + $processValue;
+     	//return $this->roundUpToAny($discPrice);
+     	return $mrp;
      } 
 	
 	private function filter_number_from_string($string) {
 		
-       preg_match_all('!\d+!', $string, $matches);
-       return implode("",$matches[0]);
-		//$matches=explode(".",$string);
-        //return $matches;
+       //preg_match_all('!\d+!', $string, $matches);
+       //return implode("",$matches[0]);
+		$matches=explode(".",$string);
+        return $matches[1];
     }
 
     private function roundUpToAny($n,$x=5,$y=10) {
