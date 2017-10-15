@@ -315,7 +315,7 @@ class ScrapformController extends Controller
 	{
 		$count=0;
 		$url = $url."&".$uri;
-		echo $url;exit;
+		//echo $url;exit;
 		$image_thumb_url=null;
 		$params=array('sort' => 'p.sort_order-ASC','page' => '1','limit' =>'500');
 		
