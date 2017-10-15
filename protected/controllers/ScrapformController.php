@@ -557,17 +557,41 @@ class ScrapformController extends Controller
         //{
         //$destdir = '/var/www/mountcart/image/data/';
         //$destdir = "/home/mountcart12/www/image/data/";
-        	$link='https:'.$book['image_main_url'];
-        	//$link=$book['image_main_url'];
-	        //$destdir = "/var/www/html/mcscrap/image/data/";
-	        $destdir = "/home/mynewmountcart/www/image/data/";
-	        $extension = pathinfo($link, PATHINFO_EXTENSION);
-	        $img=file_get_contents($link);
-	        $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
-	        file_put_contents($destdir.$saveFileName, $img);
-	        return 'data/'.$saveFileName;
+        //$link='https:'.$book['image_main_url'];
+        	$link=$book['image_main_url'];
+        	if (!file_exists('/var/www/html/mcscrap/image/tmp/')) {
+    			mkdir('/var/www/html/mcscrap/image/tmp/', 0777, true);
+			}
+        	$destdir = "/var/www/html/mcscrap/image/tmp/";
+	        //$destdir = "/home/mynewmountcart/www/image/data/";
+	        
+	         $extension = pathinfo($link, PATHINFO_EXTENSION);
+	         $img=file_get_contents($this->file_url($link));
+	         $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
+	         file_put_contents($destdir.$saveFileName, $img);
+
+	         $destdir1="/var/www/html/mcscrap/image/data/".$saveFileName;
+	         $source_photo="/var/www/html/mcscrap/image/tmp/".$saveFileName;
+	         $d = $this->compress_image($source_photo, $destdir1, 30);
+	         $this->deleteDirectory("/var/www/html/mcscrap/image/tmp/");
+
+	         return 'data/'.$saveFileName;
     	//}
     }
+
+   	private function compress_image($source_url, $destination_url, $quality) {
+		$info = getimagesize($source_url);
+	 
+		if ($info['mime'] == 'image/jpeg') $image = imagecreatefromjpeg($source_url);
+		elseif ($info['mime'] == 'image/gif') $image = imagecreatefromgif($source_url);
+		elseif ($info['mime'] == 'image/png') $image = imagecreatefrompng($source_url);
+	 
+		//save it
+		imagejpeg($image, $destination_url, $quality);
+	 
+		//return destination file url
+		return $destination_url;
+	}
 
 
 	private function processDiscount($mrp) 
@@ -629,13 +653,51 @@ class ScrapformController extends Controller
        $book->save(false);
     }
 
+    private function file_url($url){
+	  $parts = parse_url($url);
+	  $path_parts = array_map('rawurldecode', explode('/', $parts['path']));
+
+	  return
+	    $parts['scheme'] . '://' .
+	    $parts['host'] .
+	    implode('/', array_map('rawurlencode', $path_parts));
+	}
+
+	private function deleteDirectory($dir) {
+    	system('rm -rf ' . escapeshellarg($dir), $retval);
+    	return $retval == 0; // UNIX commands return zero on success
+	}
 
     public function actionTest()
     {
+  //   	$source_photo = '/var/www/html/mcscrap/image/data/9789351448815-500x633.jpg';
+		// $dest_photo = '/var/www/html/mcscrap/image/testing.jpg';
 
-    	$string="Rs.1,265";
-    	$dd=$this->filter_number_from_string($string);
-    	print_r($dd);exit;
+    	//$d = $this->compress_image($source_photo, $dest_photo, 30);
+    		//$link='https:'.$book['image_main_url'];
+        	//$link=$book['image_main_url'];
+        	$link='https://www.gkpublications.com/image/cache/data/Other Books/9789351444732-500x633.jpg';
+        	//echo $this->file_url($link);exit;
+        	if (!file_exists('/var/www/html/mcscrap/image/tmp/')) {
+    			mkdir('/var/www/html/mcscrap/image/tmp/', 0777, true);
+			}
+
+	        $destdir = "/var/www/html/mcscrap/image/tmp/";
+	        //$destdir = "/home/mynewmountcart/www/image/data/";
+	        
+	         $extension = pathinfo($link, PATHINFO_EXTENSION);
+	         $img=file_get_contents($this->file_url($link));
+	         $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
+	         file_put_contents($destdir.$saveFileName, $img);
+
+	         $destdir1="/var/www/html/mcscrap/image/data/".$saveFileName;
+	         $source_photo="/var/www/html/mcscrap/image/tmp/".$saveFileName;
+	         $d = $this->compress_image($source_photo, $destdir1, 30);
+	         $this->deleteDirectory("/var/www/html/mcscrap/image/tmp/");
+	         return 'data/'.$saveFileName;
+    	// $string="Rs.1,265";
+    	// $dd=$this->filter_number_from_string($string);
+    	// print_r($dd);exit;
     	//$string="Availability 567567567567";
     	//echo preg_match('~[0-9]~', $string);exit;
     	
