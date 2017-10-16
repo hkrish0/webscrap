@@ -442,6 +442,9 @@ class ScrapformController extends Controller
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
         $result = array();  
         $categories=json_decode($data['mc_categories'],true); 
+        if($data['pages']==null){
+        	$data['pages']="hari";
+        }
         try {
             $imageFile = $this->pushImage($data);
 
