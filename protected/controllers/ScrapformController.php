@@ -568,14 +568,26 @@ class ScrapformController extends Controller
         	$destdir = "/home/mynewmountcart/www/image/tmp/";
 	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        
-	         $extension = pathinfo($link, PATHINFO_EXTENSION);
-	         $img=file_get_contents($this->file_url($link));
-	         $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
-	         file_put_contents($destdir.$saveFileName, $img);
+	        $extension = pathinfo($link, PATHINFO_EXTENSION);
+	        $img=file_get_contents($this->file_url($link));
+	        $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
+	        file_put_contents($destdir.$saveFileName, $img);
+	        $destdir1="/home/mynewmountcart/www/image/data/".$saveFileName;
 
-	         $destdir1="/home/mynewmountcart/www/image/data/".$saveFileName;
-	         $source_photo="/home/mynewmountcart/www/image/tmp/".$saveFileName;
-	         $d = $this->compress_image($source_photo, $destdir1, 01);
+
+	        /* Image Compression using Imagick */
+
+	        $im = new Imagick($destdir.$saveFileName);
+	        $im->optimizeImageLayers();
+			$im->setImageCompression(Imagick::COMPRESSION_JPEG);
+			$im->setImageCompressionQuality(25);
+			$im->writeImages($destdir1, true);
+
+			 /* Image Compression using Imagick */
+
+
+	         //$source_photo="/home/mynewmountcart/www/image/tmp/".$saveFileName;
+	         //$d = $this->compress_image($source_photo, $destdir1, 01);
 	         $this->deleteDirectory("/home/mynewmountcart/www/image/tmp/");
 
 	         return 'data/'.$saveFileName;
@@ -674,50 +686,19 @@ class ScrapformController extends Controller
     public function actionTest()
     {
 
-    	var_dump(gd_info());exit;
-  //   	$source_photo = '/var/www/html/mcscrap/image/data/9789351448815-500x633.jpg';
-		// $dest_photo = '/var/www/html/mcscrap/image/testing.jpg';
 
-    	//$d = $this->compress_image($source_photo, $dest_photo, 30);
-    		//$link='https:'.$book['image_main_url'];
-        	//$link=$book['image_main_url'];
-        	$link='https://www.gkpublications.com/image/cache/data/Other Books/9789351444732-500x633.jpg';
-        	//echo $this->file_url($link);exit;
-        	if (!file_exists('/var/www/html/mcscrap/image/tmp/')) {
-    			mkdir('/var/www/html/mcscrap/image/tmp/', 0777, true);
-			}
+    	$im = new Imagick("/var/www/html/mcscrap/image/tmp/ari.jpg");
 
-	        $destdir = "/var/www/html/mcscrap/image/tmp/";
-	        //$destdir = "/home/mynewmountcart/www/image/data/";
-	        
-	         $extension = pathinfo($link, PATHINFO_EXTENSION);
-	         $img=file_get_contents($this->file_url($link));
-	         $saveFileName = strtotime("now").rand(0,100).'.'.$extension;
-	         file_put_contents($destdir.$saveFileName, $img);
+		// Optimize the image layers
+		$im->optimizeImageLayers();
 
-	         $destdir1="/var/www/html/mcscrap/image/data/".$saveFileName;
-	         $source_photo="/var/www/html/mcscrap/image/tmp/".$saveFileName;
-	         $d = $this->compress_image($source_photo, $destdir1, 30);
-	         $this->deleteDirectory("/var/www/html/mcscrap/image/tmp/");
-	         return 'data/'.$saveFileName;
-    	// $string="Rs.1,265";
-    	// $dd=$this->filter_number_from_string($string);
-    	// print_r($dd);exit;
-    	//$string="Availability 567567567567";
-    	//echo preg_match('~[0-9]~', $string);exit;
-    	
-  //   	if(0 === preg_match('~[0-9]~', $string)){
-  //   		echo "only string";
-		// }
-		// else{
-		// 	echo "has number";
-		// }
-    	
-    	// $str="Rs.675.00";
-    	// $mrp = $this->filter_number_from_string($str);
-    	// $processValue=$this->processDiscount($mrp);
-     // 	$discPrice=(110-50)/100 * $mrp + $processValue;
-     // 	echo $this->roundUpToAny($discPrice);
+		// Compression and quality
+		$im->setImageCompression(Imagick::COMPRESSION_JPEG);
+		$im->setImageCompressionQuality(10);
+
+		// Write the image back
+		$im->writeImages("/var/www/html/mcscrap/image/data/ari_new.jpg", true);
+
     }
 
 	/**
