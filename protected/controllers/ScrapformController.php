@@ -575,7 +575,7 @@ class ScrapformController extends Controller
 
 	         $destdir1="/home/mynewmountcart/www/image/data/".$saveFileName;
 	         $source_photo="/home/mynewmountcart/www/image/tmp/".$saveFileName;
-	         $d = $this->compress_image($source_photo, $destdir1, 30);
+	         $d = $this->compress_image($source_photo, $destdir1, 60);
 	         $this->deleteDirectory("/home/mynewmountcart/www/image/tmp/");
 
 	         return 'data/'.$saveFileName;
