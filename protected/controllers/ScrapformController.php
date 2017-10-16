@@ -673,6 +673,8 @@ class ScrapformController extends Controller
 
     public function actionTest()
     {
+
+    	var_dump(gd_info());exit;
   //   	$source_photo = '/var/www/html/mcscrap/image/data/9789351448815-500x633.jpg';
 		// $dest_photo = '/var/www/html/mcscrap/image/testing.jpg';
 
