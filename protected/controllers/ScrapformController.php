@@ -398,7 +398,9 @@ class ScrapformController extends Controller
     					$book_data->stock_status='0';
 					}
 			        $description=$crawler->filter('div.product-info')->filter('div#tab-description')->html();
+			       // print_r(preg_replace('/[\x{10000}-\x{10FFFF}]/u', "\xEF\xBF\xBD", $description));exit;
 			        $book_data->description=$description;
+			        //$book_data->description=iconv("UTF-8", "LATIN1", $description);
 			        $book_data->image_main_url=$book_data->image_thumb_url;
 			        $book_data->isCompleted=1;
 			  		$valid=$book_data->save(false);
@@ -441,9 +443,10 @@ class ScrapformController extends Controller
 
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
         $result = array();  
+        $string = substr($data['book_name'],0,10);
         $categories=json_decode($data['mc_categories'],true); 
         if($data['pages']==null){
-        	$data['pages']="hari";
+        	$data['pages']="";
         }
         try {
             $imageFile = $this->pushImage($data);
@@ -539,6 +542,8 @@ class ScrapformController extends Controller
                 'date_start'=>'0000-00-00',
                 'date_end'=>'0000-00-00'
             ));
+
+
 
             $this->setPushSuccess($data['id']);
 
@@ -685,7 +690,14 @@ class ScrapformController extends Controller
 
     public function actionTest()
     {
+    	//echo mb_detect_encoding("\xEF\x83\x98",'UTF-8',true);
 
+    	echo iconv("LATIN1", "UTF-8", "\xEF\x83\x98");exit;
+
+
+    	$b = unpack('C*', "\xEF\x83\x98"); 
+		var_dump($b); 	 
+    	exit;
 
     	$im = new Imagick("/var/www/html/mcscrap/image/tmp/ari.jpg");
 
