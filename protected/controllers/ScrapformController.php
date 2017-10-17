@@ -413,6 +413,8 @@ class ScrapformController extends Controller
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
         $result = array();  
         $categories=json_decode($data['mc_categories'],true); 
+        $product_keyword=substr($data['book_name'],0,4);
+       
         try {
             $imageFile = $this->pushImage($data);
 
@@ -468,6 +470,7 @@ class ScrapformController extends Controller
                 'language_id' => 1,
                 'text'        =>$data['attribute']
             ));
+
             
             foreach($categories as $sub)
             {
@@ -496,17 +499,25 @@ class ScrapformController extends Controller
             $result['status'] = 'Success';
             $result['product_id'] = $product_id;
 
-            //Add Special Discount
-            Yii::app()->db2->createCommand()->insert('oc_product_special', array(
+
+
+            Yii::app()->db2->createCommand()->insert('oc_product_attribute', array(
                 'product_id' => $product_id,
-                'customer_group_id' => 1,
-                'priority' => 0,
-                'price' => $data['discount_price'],
-                // 'date_start'=>new CDbExpression('NOW()'),
-                // 'date_end'=>new CDbExpression('NOW()')
-                'date_start'=>'0000-00-00',
-                'date_end'=>'0000-00-00'
+                'attribute_id' => 17,
+                'language_id' => 1,
+                'text'        =>$data['attribute']
             ));
+
+            $related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="'.$categories[1].'" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+
+           	
+           	foreach($related_products as $related_product_id){
+        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+	                'product_id' =>$product_id,
+	                'related_id' =>$related_product_id['product_id'],
+            	));
+        	}
+            
 
             $this->setPushSuccess($data['id']);
 
