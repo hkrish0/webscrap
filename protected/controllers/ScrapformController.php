@@ -539,8 +539,8 @@ class ScrapformController extends Controller
         //{
         //$destdir = '/var/www/mountcart/image/data/';
         //$destdir = "/home/mountcart12/www/image/data/";
-        	$link='https:'.$book['image_main_url'];
-        	//$link=$book['image_main_url'];
+        	//$link='https:'.$book['image_main_url'];
+        	$link=$book['image_main_url'];
 	        $destdir = "/var/www/html/mcscrap/image/data/";
 	        //$destdir = "/home/mynewmountcart/www/image/data/";
 	        $extension = pathinfo($link, PATHINFO_EXTENSION);
