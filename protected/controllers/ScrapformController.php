@@ -550,10 +550,10 @@ class ScrapformController extends Controller
 		                'product_id' =>$product_id,
 		                'related_id' =>$related_product_id,
 	            	));
-	            	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		                'product_id' =>$related_product_id,
-		                'related_id' =>$product_id,
-	            	));
+	            	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		            //     'product_id' =>$related_product_id,
+		            //     'related_id' =>$product_id,
+	            	// ));
 	        	}
         	}
             
