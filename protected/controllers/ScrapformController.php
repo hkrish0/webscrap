@@ -413,17 +413,26 @@ class ScrapformController extends Controller
 
 
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
-        $result = array();  
-        $string = substr($data['book_name'],0,10);
+        $result = array(); 
+        $related_products_all=array();
+        	$product_name_count=strlen($data['book_name']);
+
+            while($product_name_count > 0 ){
+            	$product_keyword=substr($data['book_name'],0,$product_name_count);
+            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+            	$related_products_all[]=$related_products;
+            	$product_name_count--;
+            	if(count($related_products_all) >= 10){
+            		break;
+            	}
+        	}
+        	print_r($related_products_all);exit;
+        //$string = substr($data['book_name'],0,25);
         $categories=json_decode($data['mc_categories'],true); 
-
-        $product_keyword=substr($data['book_name'],0,4);
-       
-
+        
         if($data['pages']==null){
         	$data['pages']="";
         }
-
         try {
             $imageFile = $this->pushImage($data);
 
@@ -509,9 +518,21 @@ class ScrapformController extends Controller
             $result['product_id'] = $product_id;
 
 
-            $related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="'.$categories[1].'" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+            /* Related Products */
 
-           	
+         //   	$product_name_count=strlen($data['book_name']);
+
+         //    while($product_name_count > 0 ){
+         //    	$product_keyword=substr($data['book_name'],0,$product_name_count);
+         //    	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="'.$categories[1].'" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+         //    	$related_products_all[]=$related_products;
+         //    	$product_name_count--;
+         //    	if(count($related_products_all) >= 10){
+         //    		break;
+         //    	}
+        	// }
+
+
            	foreach($related_products as $related_product_id){
         		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
 	                'product_id' =>$product_id,
