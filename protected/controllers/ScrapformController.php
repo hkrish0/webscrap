@@ -426,9 +426,9 @@ class ScrapformController extends Controller
             		break;
             	}
         	}
-        	print_r(count($related_products_all));
+        	//print_r(count($related_products_all));
         	foreach($related_products_all as $related_product_id){
-        		print_r($related_product_id);exit;
+        		"<pre>",print_r($related_product_id),"<pre>";
         	}
         	exit;
         //$string = substr($data['book_name'],0,25);
