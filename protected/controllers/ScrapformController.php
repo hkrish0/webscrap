@@ -422,7 +422,7 @@ class ScrapformController extends Controller
             	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
 
             	foreach($related_products as $related_id){
-            		$related_products_all[]=$related_products;
+            		$related_products_all[]=$related_products['product_id'];
             		//echo $related_id['product_id']."<br/>";
             	}
             	//echo "count ==".count($related_products_all);
