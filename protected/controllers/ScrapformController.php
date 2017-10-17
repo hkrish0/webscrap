@@ -428,7 +428,7 @@ class ScrapformController extends Controller
         	}
         	//print_r(count($related_products_all));
         	foreach($related_products_all as $related_product_id){
-        		"<pre>",print_r($related_product_id),"<pre>";
+        		echo "<pre>",print_r($related_product_id),"<pre>";
         	}
         	exit;
         //$string = substr($data['book_name'],0,25);
