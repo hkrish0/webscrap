@@ -415,36 +415,14 @@ class ScrapformController extends Controller
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
         $result = array(); 
         $related_products_all=array();
-        	$product_name_count=strlen($data['book_name']);
+        $product_name_count=strlen($data['book_name']);
 
-            while($product_name_count > 0 ){
-            	$product_keyword=substr($data['book_name'],0,$product_name_count);
-            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
-
-            	foreach($related_products as $related_id){
-            		$related_products_all[]=$related_id['product_id'];
-            		
-            		//echo $related_id['product_id']."<br/>";
-            	}
-            	echo "count ==".count($related_products_all);
-            	if(count($related_products_all) >= "10"){
-            			break;
-            		}
-            	//exit;
-            	//print_r($related_products);exit;
-            	//$merged = call_user_func_array('array_merge', $related_products);
-            	//print_r($merged);exit;
-            	//$related_products_all=array_values($related_products);
-            	//print_r($related_products_all);exit;
-            	//$related_products_all[]=$related_products;
-            	$product_name_count--;
-            	
-        	}
+            
         	//print_r($related_products_all);exit;
-        	foreach($related_products_all as $related_product_id){
-        		echo "<pre>",print_r($related_product_id),"<pre>";
-        	}
-        	exit;
+        	//foreach($related_products_all as $related_product_id){
+        		//echo "<pre>",print_r($related_product_id),"<pre>";
+        	//}
+        	//exit;
         //$string = substr($data['book_name'],0,25);
         $categories=json_decode($data['mc_categories'],true); 
         
@@ -551,15 +529,32 @@ class ScrapformController extends Controller
         	// }
 
 
-           	foreach($related_products as $related_product_id){
-        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-	                'product_id' =>$product_id,
-	                'related_id' =>$related_product_id['product_id'],
-            	));
-            	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-	                'product_id' =>$related_product_id['product_id'],
-	                'related_id' =>$product_id,
-            	));
+            while($product_name_count > 0 ){
+            	$product_keyword=substr($data['book_name'],0,$product_name_count);
+            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+            	if(!empty($related_products)){
+	            	foreach($related_products as $related_id){
+	            		$related_products_all[]=$related_id['product_id'];
+	            	}
+	            }	
+            	//echo "count ==".count($related_products_all);
+            	if(count($related_products_all) >= "10"){
+            		break;
+            	}
+            	$product_name_count--;
+            	
+        	}
+        	if(!empty($related_products_all)){
+	           	foreach($related_products_all as $related_product_id){
+	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$product_id,
+		                'related_id' =>$related_product_id,
+	            	));
+	            	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$related_product_id,
+		                'related_id' =>$product_id,
+	            	));
+	        	}
         	}
             
          //    foreach($related_products as $related_product_id){
