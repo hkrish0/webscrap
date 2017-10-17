@@ -423,9 +423,12 @@ class ScrapformController extends Controller
 
             	foreach($related_products as $related_id){
             		$related_products_all[]=$related_products['product_id'];
+            		if(count($related_products_all) >= 10){
+            			break;
+            		}
             		//echo $related_id['product_id']."<br/>";
             	}
-            	//echo "count ==".count($related_products_all);
+            	echo "count ==".count($related_products_all);
             	//exit;
             	//print_r($related_products);exit;
             	//$merged = call_user_func_array('array_merge', $related_products);
@@ -434,9 +437,7 @@ class ScrapformController extends Controller
             	//print_r($related_products_all);exit;
             	//$related_products_all[]=$related_products;
             	$product_name_count--;
-            	if(count($related_products_all) >= 10){
-            		break;
-            	}
+            	
         	}
         	//print_r(count($related_products_all));
         	foreach($related_products_all as $related_product_id){
