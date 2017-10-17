@@ -509,15 +509,6 @@ class ScrapformController extends Controller
             $result['product_id'] = $product_id;
 
 
-
-            Yii::app()->db2->createCommand()->insert('oc_product_attribute', array(
-                'product_id' => $product_id,
-                'attribute_id' => 17,
-                'language_id' => 1,
-                'text'        =>$data['attribute']
-            ));
-
-
             $related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="'.$categories[1].'" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
 
            	
