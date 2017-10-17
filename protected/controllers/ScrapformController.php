@@ -423,16 +423,16 @@ class ScrapformController extends Controller
 
             	foreach($related_products as $related_id){
             		$related_products_all[]=$related_products;
-            		echo $related_id['product_id']."<br/>";
+            		//echo $related_id['product_id']."<br/>";
             	}
-            	echo "count ==".count($related_products_all);
-            	exit;
-            	print_r($related_products);exit;
-            	$merged = call_user_func_array('array_merge', $related_products);
-            	print_r($merged);exit;
-            	$related_products_all=array_values($related_products);
-            	print_r($related_products_all);exit;
-            	$related_products_all[]=$related_products;
+            	//echo "count ==".count($related_products_all);
+            	//exit;
+            	//print_r($related_products);exit;
+            	//$merged = call_user_func_array('array_merge', $related_products);
+            	//print_r($merged);exit;
+            	//$related_products_all=array_values($related_products);
+            	//print_r($related_products_all);exit;
+            	//$related_products_all[]=$related_products;
             	$product_name_count--;
             	if(count($related_products_all) >= 10){
             		break;
