@@ -414,7 +414,7 @@ class ScrapformController extends Controller
 
 	public function addToMountCart($data, $stock_status=0, $quantity=0, $status = 0) {
         $result = array(); 
-        //$related_products_all=array();
+        $related_products_all=array();
         	$product_name_count=strlen($data['book_name']);
 
             while($product_name_count > 0 ){
@@ -422,8 +422,10 @@ class ScrapformController extends Controller
             	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
 
             	foreach($related_products as $related_id){
+            		$related_products_all[]=$related_products;
             		echo $related_id['product_id']."<br/>";
             	}
+            	echo "count ==".count($related_products_all);
             	exit;
             	print_r($related_products);exit;
             	$merged = call_user_func_array('array_merge', $related_products);
