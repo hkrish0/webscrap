@@ -519,6 +519,12 @@ class ScrapformController extends Controller
             	));
         	}
             
+            foreach($related_products as $related_product_id){
+        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+	                'product_id' =>$related_product_id['product_id'],
+	                'related_id' =>$product_id,
+            	));
+        	}
 
 
             $this->setPushSuccess($data['id']);
