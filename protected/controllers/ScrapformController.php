@@ -426,7 +426,7 @@ class ScrapformController extends Controller
             		break;
             	}
         	}
-        	print_r($related_products_all);exit;
+        	print_r(count($related_products_all));exit;
         //$string = substr($data['book_name'],0,25);
         $categories=json_decode($data['mc_categories'],true); 
         
