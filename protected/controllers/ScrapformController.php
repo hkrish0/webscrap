@@ -737,7 +737,7 @@ class ScrapformController extends Controller
 
 	private function remove_duplicate_from_array($array)
 	{
-		return array_unique($dummy);
+		return array_unique($array);
 	}
 
     public function actionTest()
