@@ -540,6 +540,18 @@ class ScrapformController extends Controller
             
              /**** Related Products *****/
 
+              //Add Special Discount
+            Yii::app()->db2->createCommand()->insert('oc_product_special', array(
+                'product_id' => $product_id,
+                'customer_group_id' => 1,
+                'priority' => 0,
+                'price' => $data['discount_price'],
+                // 'date_start'=>new CDbExpression('NOW()'),
+                // 'date_end'=>new CDbExpression('NOW()')
+                'date_start'=>'0000-00-00',
+                'date_end'=>'0000-00-00'
+            ));
+
             $this->setPushSuccess($data['id']);
 
            
