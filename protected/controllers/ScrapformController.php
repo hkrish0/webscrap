@@ -416,7 +416,7 @@ class ScrapformController extends Controller
         $result = array(); 
         $related_products_all=array();
         $product_name_count=strlen($data['book_name']);
-
+        $categories=json_decode($data['mc_categories'],true); 
 
         while($product_name_count > 0 ){
             	
@@ -453,7 +453,7 @@ class ScrapformController extends Controller
 
             
         	
-        $categories=json_decode($data['mc_categories'],true); 
+        
         
         if($data['pages']==null){
         	$data['pages']="";
