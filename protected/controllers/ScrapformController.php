@@ -522,14 +522,14 @@ class ScrapformController extends Controller
 	            $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
 	        	$product_name_count--;
 	        }
-	        
+	        echo "count=".count($related_products_all_unique);
 	    	if(!empty($related_products_all_unique)){
 	           	foreach($related_products_all_unique as $related_product_id){
 	           		echo $related_product_id."<br/>";
-	        		// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		         //        'product_id' =>$product_id,
-		         //        'related_id' =>$related_product_id,
-	          //   	));
+	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$product_id,
+		                'related_id' =>$related_product_id,
+	            	));
 	          //   	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
 		         //        'product_id' =>$related_product_id,
 		         //        'related_id' =>$product_id,
