@@ -438,8 +438,9 @@ class ScrapformController extends Controller
             	// }
             	
             	$product_name_count--;
-            	echo "<pre>",print_r($related_products_all_unique),"<pre>";
+            	
         	}
+        	echo "<pre>",print_r($related_products_all_unique),"<pre>";
         	exit;
         	if(!empty($related_products_all_unique)){
 	           	foreach($related_products_all_unique as $related_product_id){
