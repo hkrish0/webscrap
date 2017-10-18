@@ -428,16 +428,16 @@ class ScrapformController extends Controller
 	            		$related_products_all[]=$related_id['product_id'];
 	            	}
 	            }	
-	            $related_products_all_unique=array_unique($related_products_all);
+	            $related_products_all_unique=remove_duplicate_from_array($related_products_all);
             	//echo "count ==".count($related_products_all);
             	// if(count($related_products_all) >= "10"){
             	// 	break;
             	// }
             	
             	$product_name_count--;
-            	echo "<pre>",print_r($related_products_all_unique),"<pre>";
+            	//echo "<pre>",print_r($related_products_all_unique),"<pre>";
         	}
-        	exit;
+        	//exit;
         	if(!empty($related_products_all_unique)){
 	           	foreach($related_products_all_unique as $related_product_id){
 	           		echo $related_product_id."<br/>";
@@ -732,28 +732,16 @@ class ScrapformController extends Controller
     	return $retval == 0; // UNIX commands return zero on success
 	}
 
+	private function remove_duplicate_from_array($array)
+	{
+		return array_unique($dummy);
+	}
+
     public function actionTest()
     {
     	//echo mb_detect_encoding("\xEF\x83\x98",'UTF-8',true);
-
-    	echo iconv("LATIN1", "UTF-8", "\xEF\x83\x98");exit;
-
-
-    	$b = unpack('C*', "\xEF\x83\x98"); 
-		var_dump($b); 	 
-    	exit;
-
-    	$im = new Imagick("/var/www/html/mcscrap/image/tmp/ari.jpg");
-
-		// Optimize the image layers
-		$im->optimizeImageLayers();
-
-		// Compression and quality
-		$im->setImageCompression(Imagick::COMPRESSION_JPEG);
-		$im->setImageCompressionQuality(10);
-
-		// Write the image back
-		$im->writeImages("/var/www/html/mcscrap/image/data/ari_new.jpg", true);
+    	$dummy=array('0'=>'A','1'=>'B','2'=>'C','3'=>'D','4'=>'A','5'=>'E','6'=>'B');
+    	print_r(array_unique($dummy));
 
     }
 
