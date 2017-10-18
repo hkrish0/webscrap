@@ -425,7 +425,9 @@ class ScrapformController extends Controller
             	if(!empty($related_products)){
             		//echo "<pre>",print_r($related_products),"<pre>";exit;
 	            	foreach($related_products as $related_id){
-	            		$related_products_all[]=$related_id['product_id'];
+
+	            		array_push($related_products_all,$related_id['product_id']);
+	            		//$related_products_all[]=$related_id['product_id'];
 	            	}
 	            }	
 	            print_r($related_products_all);
