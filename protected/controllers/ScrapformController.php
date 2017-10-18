@@ -416,55 +416,10 @@ class ScrapformController extends Controller
         $result = array(); 
         $related_products_all=array();
         $product_name_count=strlen($data['book_name']);
-        //echo $product_name_count;exit;
         $categories=json_decode($data['mc_categories'],true); 
 
-        while($product_name_count > 0 ){
-            	
-            	$product_keyword=substr($data['book_name'],0,$product_name_count);
-            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product` WHERE product_id IN (SELECT product_id FROM oc_product_to_category WHERE category_id="'.$categories[1].'") AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'")  LIMIT 10')->queryAll();
-            	if(!empty($related_products)){
-            		//echo "<pre>",print_r($related_products),"<pre>";
-	            	foreach($related_products as $related_id){
-
-	            		array_push($related_products_all,$related_id['product_id']);
-	            		//$related_products_all[]=$related_id['product_id'];
-	            	}
-	            }	
-	            //echo "<pre>",print_r($related_products_all),"<pre>";
-	            $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
-            	//echo "count ==".count($related_products_all);
-            	// if(count($related_products_all_unique) >= "10"){
-            	// 	break;
-            	// }
-            	
-            	$product_name_count--;
-            	echo $product_keyword." ".$product_name_count."<br/>";
-            	
-        	}
-        	echo "<pre>",print_r($related_products_all_unique),"<pre>";
-        	//exit;
-        	if(!empty($related_products_all_unique)){
-	           	foreach($related_products_all_unique as $related_product_id){
-	           		echo $related_product_id."<br/>";
-	        		// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		         //        'product_id' =>$product_id,
-		         //        'related_id' =>$related_product_id,
-	          //   	));
-	            	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		            //     'product_id' =>$related_product_id,
-		            //     'related_id' =>$product_id,
-	            	// ));
-	        	}
-        	}
-            
-        	 exit;
-
-
-            
-        	
         
-        
+            
         if($data['pages']==null){
         	$data['pages']="";
         }
@@ -553,44 +508,35 @@ class ScrapformController extends Controller
             $result['product_id'] = $product_id;
 
 
-            /* Related Products */
+            /***** Related Products *****/
 
-        
-
-
-     //        while($product_name_count > 0 ){
-            	
-     //        	$product_keyword=substr($data['book_name'],0,$product_name_count);
-     //        	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product` WHERE product_id IN (SELECT product_id FROM oc_product_to_category WHERE category_id="'.$categories[1].'") AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") AND product_id <> '.$product_id.' LIMIT 10
-					// ')->queryAll();
-     //        	if(!empty($related_products)){
-	    //         	foreach($related_products as $related_id){
-	    //         		$related_products_all[]=$related_id['product_id'];
-	    //         	}
-	    //         }	
-     //        	//echo "count ==".count($related_products_all);
-     //        	if(count($related_products_all) >= "10"){
-     //        		break;
-     //        	}
-            	
-     //        	$product_name_count--;
-     //    	}
-     //    	if(!empty($related_products_all)){
-	    //        	foreach($related_products_all as $related_product_id){
-	    //        		//echo $related_product_id;
-	    //     		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		   //              'product_id' =>$product_id,
-		   //              'related_id' =>$related_product_id,
-	    //         	));
-	    //         	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		   //          //     'product_id' =>$related_product_id,
-		   //          //     'related_id' =>$product_id,
-	    //         	// ));
-	    //     	}
-     //    	}
+	    	while($product_name_count > 0 ){
+	        	$product_keyword=substr($data['book_name'],0,$product_name_count);
+	        	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product` WHERE product_id IN (SELECT product_id FROM oc_product_to_category WHERE category_id="'.$categories[1].'") AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'")  LIMIT 10')->queryAll();
+	        	if(!empty($related_products)){
+	            	foreach($related_products as $related_id){
+	            		array_push($related_products_all,$related_id['product_id']);	
+	            	}
+	            }	
+	  
+	            $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
+	        	$product_name_count--;
+	        }
+	        
+	    	if(!empty($related_products_all_unique)){
+	           	foreach($related_products_all_unique as $related_product_id){
+	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$product_id,
+		                'related_id' =>$related_product_id,
+	            	));
+	            	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$related_product_id,
+		                'related_id' =>$product_id,
+	            	));
+	        	}
+	    	}
             
-            
-
+             /**** Related Products *****/
 
             $this->setPushSuccess($data['id']);
 
