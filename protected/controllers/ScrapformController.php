@@ -436,10 +436,10 @@ class ScrapformController extends Controller
         	if(!empty($related_products_all)){
 	           	foreach($related_products_all as $related_product_id){
 	           		echo $related_product_id."<br/>";
-	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		                'product_id' =>$product_id,
-		                'related_id' =>$related_product_id,
-	            	));
+	        		// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		         //        'product_id' =>$product_id,
+		         //        'related_id' =>$related_product_id,
+	          //   	));
 	            	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
 		            //     'product_id' =>$related_product_id,
 		            //     'related_id' =>$product_id,
