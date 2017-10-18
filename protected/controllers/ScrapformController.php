@@ -430,7 +430,7 @@ class ScrapformController extends Controller
 	            		//$related_products_all[]=$related_id['product_id'];
 	            	}
 	            }	
-	            print_r($related_products_all);
+	            echo "<pre>",print_r($related_products_all),"<pre>";
 	            $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
             	//echo "count ==".count($related_products_all);
             	// if(count($related_products_all) >= "10"){
@@ -440,7 +440,7 @@ class ScrapformController extends Controller
             	$product_name_count--;
             	//echo "<pre>",print_r($related_products_all_unique),"<pre>";
         	}
-        	//exit;
+        	exit;
         	if(!empty($related_products_all_unique)){
 	           	foreach($related_products_all_unique as $related_product_id){
 	           		echo $related_product_id."<br/>";
