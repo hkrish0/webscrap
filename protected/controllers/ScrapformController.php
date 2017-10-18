@@ -418,24 +418,24 @@ class ScrapformController extends Controller
         $product_name_count=strlen($data['book_name']);
 
 
-        while($product_name_count > 0 ){
-            	$product_keyword=substr($data['book_name'],0,$product_name_count);
-            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
-            	if(!empty($related_products)){
-	            	foreach($related_products as $related_id){
-	            		$related_products_all[]=$related_id['product_id'];
-	            	}
-	            }	
-            	//echo "count ==".count($related_products_all);
-            	if(count($related_products_all) >= "10"){
-            		break;
-            	}
-            	$product_name_count--;
+        // while($product_name_count > 0 ){
+        //     	$product_keyword=substr($data['book_name'],0,$product_name_count);
+        //     	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+        //     	if(!empty($related_products)){
+	       //      	foreach($related_products as $related_id){
+	       //      		$related_products_all[]=$related_id['product_id'];
+	       //      	}
+	       //      }	
+        //     	//echo "count ==".count($related_products_all);
+        //     	if(count($related_products_all) >= "10"){
+        //     		break;
+        //     	}
+        //     	$product_name_count--;
             	
-        	}
-        	if(!empty($related_products_all)){
-	           	foreach($related_products_all as $related_product_id){
-	           		echo $related_product_id."<br/>";
+        // 	}
+        // 	if(!empty($related_products_all)){
+	       //     	foreach($related_products_all as $related_product_id){
+	       //     		echo $related_product_id."<br/>";
 	        		// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
 		         //        'product_id' =>$product_id,
 		         //        'related_id' =>$related_product_id,
@@ -444,9 +444,9 @@ class ScrapformController extends Controller
 		            //     'product_id' =>$related_product_id,
 		            //     'related_id' =>$product_id,
 	            	// ));
-	        	}
-        	}
-        	exit;
+	        // 	}
+        	// }
+        	// exit;
 
 
             
@@ -556,41 +556,36 @@ class ScrapformController extends Controller
         	// }
 
 
-         //    while($product_name_count > 0 ){
-         //    	$product_keyword=substr($data['book_name'],0,$product_name_count);
-         //    	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
-         //    	if(!empty($related_products)){
-	        //     	foreach($related_products as $related_id){
-	        //     		$related_products_all[]=$related_id['product_id'];
-	        //     	}
-	        //     }	
-         //    	//echo "count ==".count($related_products_all);
-         //    	if(count($related_products_all) >= "10"){
-         //    		break;
-         //    	}
-         //    	$product_name_count--;
+            while($product_name_count > 0 ){
+            	$product_keyword=substr($data['book_name'],0,$product_name_count);
+            	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product_to_category` WHERE category_id="209" AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'") LIMIT 10')->queryAll();
+            	if(!empty($related_products)){
+	            	foreach($related_products as $related_id){
+	            		$related_products_all[]=$related_id['product_id'];
+	            	}
+	            }	
+            	//echo "count ==".count($related_products_all);
+            	if(count($related_products_all) >= "10"){
+            		break;
+            	}
+            	$product_name_count--;
             	
-        	// }
-        	// if(!empty($related_products_all)){
-	        //    	foreach($related_products_all as $related_product_id){
-	        //    		echo $related_product_id;
-	        // 		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		       //          'product_id' =>$product_id,
-		       //          'related_id' =>$related_product_id,
-	        //     	));
-	        //     	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		       //      //     'product_id' =>$related_product_id,
-		       //      //     'related_id' =>$product_id,
-	        //     	// ));
-	        // 	}
-        	// }
+        	}
+        	if(!empty($related_products_all)){
+	           	foreach($related_products_all as $related_product_id){
+	           		//echo $related_product_id;
+	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		                'product_id' =>$product_id,
+		                'related_id' =>$related_product_id,
+	            	));
+	            	// Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		            //     'product_id' =>$related_product_id,
+		            //     'related_id' =>$product_id,
+	            	// ));
+	        	}
+        	}
             
-         //    foreach($related_products as $related_product_id){
-        	// 	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-	        //         'product_id' =>$related_product_id['product_id'],
-	        //         'related_id' =>$product_id,
-         //    	));
-        	// }
+            
 
 
             $this->setPushSuccess($data['id']);
