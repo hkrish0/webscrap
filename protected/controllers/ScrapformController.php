@@ -65,6 +65,8 @@ class ScrapformController extends Controller
 	public function actionCreate()
 	{
 		$model=new Scrapform;
+		$model->discount_x=50;
+		$model->discount_y=110;
 		if(isset($_POST['Scrapform']))
 		{
 			$model->attributes=$_POST['Scrapform'];
@@ -73,12 +75,13 @@ class ScrapformController extends Controller
 			$attr=$model->attribute;
 			$url = (empty($model->url) ? $publisher->url : $model->url);
 			$uri = (empty($publisher->uri) ? $model->uri : $publisher->uri);
+			$discount_x=$model->discount_x;
+			$discount_y=$model->discount_y;
 			$mountcart_categories=json_encode($_POST['Scrapform']['mount_categories']);
 			$publisher_function=$publisher->function_name;
-			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories);
+			$status=$this->$publisher_function($publisher_id,$url,$uri,$attr,$mountcart_categories,$discount_x,$discount_y);
 			
 			$result=json_decode($status);
-
 			if($result->status==Scrapform::STATUS_SUCCESS){
 				echo "Status : ".$result->status."<br/> Inserted : ".$result->inserted." </br>Out of Stock : ".$result->OutStock;
 			}
@@ -310,7 +313,7 @@ class ScrapformController extends Controller
 
 	/* Get Gk publication Books */
 
-	public function getGk($publisher_id,$url,$uri,$attr,$mc_cat)
+	public function getGk($publisher_id,$url,$uri,$attr,$mc_cat,$discount_x,$discount_y)
 	{
 		$count=0;
 		$stock_count=0;
@@ -340,9 +343,10 @@ class ScrapformController extends Controller
 		    		if($crawler->filter('div.image > a > img')->count()){
 		    			$image_thumb_url=$crawler->filter('div.image > a > img')->attr('src');
 		    		}
+
 		    		$book->book_name = $book_name;
 	    			$book->mrp = $mrp;
-	    			$book->discount_price = $this->calculateDiscount($book->mrp);
+	    			$book->discount_price = $this->calculateDiscount($book->mrp,$discount_x,$discount_y);
 	    			$book->book_url = $book_url;
 	    			$book->image_thumb_url = $image_thumb_url;
 	    			$book->image_main_url= $image_thumb_url;
@@ -651,12 +655,11 @@ class ScrapformController extends Controller
         }
     }
 
-     private function calculateDiscount($mrp)
+     private function calculateDiscount($mrp,$discount_x,$discount_y)
      {
-     	$x=45;$y=110;
-     	$mrp = $this->filter_number_from_string($mrp);
+     	$mrp = $this->filter_number($mrp);
      	$processValue=$this->processDiscount($mrp);
-     	$discPrice=(($y-$x)/100 * $mrp) + $processValue;
+     	$discPrice=(($discount_y-$discount_x)/100 * $mrp) + $processValue;
      	//return $this->roundUpToAny($discPrice);
      	return $mrp;
      } 

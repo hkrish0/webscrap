@@ -73,7 +73,9 @@ class Scrapform extends CActiveRecord
 			'uri' => 'Uri',
 			'attribute' => 'Attribute',
 			'publisher_cat' =>'Publisher Categories',
-			'mount_categories' => 'Mount Categories'
+			'mount_categories' => 'Mount Categories',
+			'discount_x'=>'Discount X',
+			'discount_y'=>'Discount Y',
 
 		);
 	}

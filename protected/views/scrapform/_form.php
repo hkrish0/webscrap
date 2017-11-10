@@ -36,6 +36,23 @@
 
 
 	<div class="row">
+		<?php echo $form->labelEx($model,'discount_x'); ?>
+		<?php echo $form->textField($model,'discount_x',array('size'=>30,'maxlength'=>50)); ?>
+		<?php echo $form->error($model,'discount_x'); ?>
+	</div>
+
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'discount_y'); ?>
+		<?php echo $form->textField($model,'discount_y',array('size'=>30,'maxlength'=>50)); ?>
+		<?php echo $form->error($model,'discount_y'); ?>
+	</div>
+
+
+
+
+
+	<div class="row">
 		<?php echo CHtml::activeLabel($model,'mount_categories'); ?>
 		<?php echo $form->dropDownList($model, 'mount_categories', CHtml::listData(OcCategoryDescription::model()->findAll(), 'category_id', 'name'),array('empty'=>'','multiple'=>true ,'style'=>'width:400px;','size'=>'10'));?>
 		<?php //echo $form->error($model,'publisher_id'); ?>
