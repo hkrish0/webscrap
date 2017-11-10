@@ -514,33 +514,33 @@ class ScrapformController extends Controller
 
             /***** Related Products *****/
 
-	    	while($product_name_count > 0 ){
-	        	$product_keyword=substr($data['book_name'],0,$product_name_count);
-	        	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product` WHERE product_id IN (SELECT product_id FROM oc_product_to_category WHERE category_id="'.$categories[1].'") AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'")  AND product_id <> '.$product_id.' LIMIT 10')->queryAll();
-	        	if(!empty($related_products)){
-	            	foreach($related_products as $related_id){
-	            		array_push($related_products_all,$related_id['product_id']);	
-	            	}
-	            }	
+	    	// while($product_name_count > 0 ){
+	     //    	$product_keyword=substr($data['book_name'],0,$product_name_count);
+	     //    	$related_products = Yii::app()->db2->createCommand('SELECT product_id FROM `oc_product` WHERE product_id IN (SELECT product_id FROM oc_product_to_category WHERE category_id="'.$categories[1].'") AND product_id IN (SELECT product_id FROM `oc_product_description` WHERE name LIKE "'.$product_keyword.'%") AND product_id IN (SELECT product_id FROM `oc_product_attribute` where text="'.$data['attribute'].'")  AND product_id <> '.$product_id.' LIMIT 10')->queryAll();
+	     //    	if(!empty($related_products)){
+	     //        	foreach($related_products as $related_id){
+	     //        		array_push($related_products_all,$related_id['product_id']);	
+	     //        	}
+	     //        }	
 	  
-	            $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
-	        	$product_name_count--;
-	        }
-	        echo "count=".count($related_products_all_unique)."<br/>";
-	    	if(!empty($related_products_all_unique)){
-	           	foreach($related_products_all_unique as $related_product_id){
-	           		echo $related_product_id."<br/>";
-	        		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		                'product_id' =>$product_id,
-		                'related_id' =>$related_product_id,
-	            	));
-	            	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
-		                'product_id' =>$related_product_id,
-		                'related_id' =>$product_id,
-	            	));
-	        	}
-	        	//exit;
-	    	}//
+	     //        $related_products_all_unique=$this->remove_duplicate_from_array($related_products_all);
+	     //    	$product_name_count--;
+	     //    }
+	     //    echo "count=".count($related_products_all_unique)."<br/>";
+	    	// if(!empty($related_products_all_unique)){
+	     //       	foreach($related_products_all_unique as $related_product_id){
+	     //       		echo $related_product_id."<br/>";
+	     //    		Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		    //             'product_id' =>$product_id,
+		    //             'related_id' =>$related_product_id,
+	     //        	));
+	     //        	Yii::app()->db2->createCommand()->insert('oc_product_related', array(
+		    //             'product_id' =>$related_product_id,
+		    //             'related_id' =>$product_id,
+	     //        	));
+	     //    	}
+	        	
+	    	// }
             
              /**** Related Products *****/
 
@@ -657,11 +657,11 @@ class ScrapformController extends Controller
 
      private function calculateDiscount($mrp,$discount_x,$discount_y)
      {
-     	$mrp = $this->filter_number($mrp);
+     	$mrp = $this->filter_number_from_string($mrp);
      	$processValue=$this->processDiscount($mrp);
      	$discPrice=(($discount_y-$discount_x)/100 * $mrp) + $processValue;
-     	//return $this->roundUpToAny($discPrice);
-     	return $mrp;
+     	return $this->roundUpToAny($discPrice);
+     	
      } 
 	
 	private function filter_number_from_string($string) {
