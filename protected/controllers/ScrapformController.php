@@ -34,7 +34,8 @@ class ScrapformController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','details','addmount','getgk','getgkcat','getgkdetails','deleteall'),
+				'actions'=>array('create','update','details','addmount','getgk','getgkcat',
+				'getgkdetails','deleteall','getstate','getdistrict','gettaluk','getvillage'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -805,4 +806,324 @@ class ScrapformController extends Controller
 			Yii::app()->end();
 		}
 	}
+
+	public function actionGetstate(){
+		$url = "https://api.data.gov.in/resource/20138aa5-e53f-4d83-a7e2-f280688b11cc";		
+		$params=array('format' => 'json','api-key' => '579b464db66ec23bdd0000018c4c71b247294c5648d4738527ad248b','limit' =>'500');
+		// $client = new Client();
+		// $res = $client->request('GET', $url,['query'=>$params]);
+		// $contents=$res->getBody()->getContents();
+		//echo "<pre>",print_r($contents),"</pre>";
+
+		$dis=$this->getdistrict();print_r($dis);exit;
+
+
+$state_list='<li data-val="35" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Andaman &amp; Nicobar Islands</div>
+</li>
+									<li data-val="28" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Andhra Pradesh</div>
+</li>
+									<li data-val="12" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Arunachal Pradesh</div>
+</li>
+									<li data-val="18" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Assam</div>
+</li>
+									<li data-val="10" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Bihar</div>
+</li>
+									<li data-val="4" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Chandigarh</div>
+</li>
+									<li data-val="22" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Chhattisgarh</div>
+</li>
+									<li data-val="26" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Dadra &amp; Nagar Haveli</div>
+</li>
+									<li data-val="25" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Daman &amp; Diu</div>
+</li>
+									<li data-val="30" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Goa</div>
+</li>
+									<li data-val="24" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Gujarat</div>
+</li>
+									<li data-val="6" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Haryana</div>
+</li>
+									<li data-val="2" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Himachal Pradesh</div>
+</li>
+									<li data-val="1" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Jammu &amp; Kashmir</div>
+</li>
+									<li data-val="20" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Jharkhand</div>
+</li>
+									<li data-val="29" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Karnataka</div>
+</li>
+									<li data-val="32" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Kerala</div>
+</li>
+									<li data-val="31" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Lakshadweep</div>
+</li>
+									<li data-val="23" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Madhya Pradesh</div>
+</li>
+									<li data-val="27" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Maharashtra</div>
+</li>
+									<li data-val="14" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Manipur</div>
+</li>
+									<li data-val="17" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Meghalaya</div>
+</li>
+									<li data-val="15" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Mizoram</div>
+</li>
+									<li data-val="13" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Nagaland</div>
+</li>
+									<li data-val="7" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Nct Of Delhi</div>
+</li>
+									<li data-val="21" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Odisha</div>
+</li>
+									<li data-val="34" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Puducherry</div>
+</li>
+									<li data-val="3" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Punjab</div>
+</li>
+									<li data-val="8" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Rajasthan</div>
+</li>
+									<li data-val="11" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Sikkim</div>
+</li>
+									<li data-val="33" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Tamil Nadu</div>
+</li>
+									<li data-val="40" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Telangana</div>
+</li>
+									<li data-val="16" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Tripura</div>
+</li>
+									<li data-val="9" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Uttar Pradesh</div>
+</li>
+									<li data-val="5" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">Uttarakhand</div>
+</li>
+									<li data-val="19" class="past" data-type="state" data-next-level="district">
+<div class="custom-select-item-content">West Bengal</div>
+</li>';
+								
+$crawler=new crawler($state_list);
+$i=0;
+while ($i<36){
+	//print_r($contents);exit;
+	$state_id=$crawler->filter('li')->eq($i)->attr('data-val');
+	$state_name=$crawler->filter('li')->filter('div')->eq($i)->html();
+
+	$states=new States;
+	$states->id=$state_id;
+	$states->state_name=$state_name;
+
+	$states->save();
+	echo $state_id." ".$state_name."<br/>";
+	$i++;
+}
+	}
+//$attr=$crawler->filter('li')->eq(1)->attr('data-val');
+
+//print_r($attr);
+//print_r($content);
+
+public function actionGetdistrict(){
+
+	$url="https://www.wikivillage.in/villages/findvalues";
+	$client = new Client();
+	$state_id=1;
+	while($state_id < 36)
+	{
+		$i=1;
+		$res = $client->request('POST', $url,[
+			'form_params' => [
+				'type' => 'state',
+				'id' => $state_id
+			]
+		]);
+		$contents=$res->getBody()->getContents();
+		$crawler=new Crawler($contents);
+		
+		foreach ($crawler->filter('li') as $li) {
+			$district_id=$crawler->filter('li')->eq($i-1)->attr('data-val');
+			$district_name=$crawler->filter('li')->filter('div')->eq($i-1)->html();
+			echo "district_id->".$district_id;
+			echo "district_name->".$district_name;
+			$district=new Districts;
+			$district->district_id=$district_id;
+			$district->state_id=$state_id;
+			$district->district_name=$district_name;
+			$district->save(false);
+			$i++;
+		}
+	$state_id++;
+	}
+}	
+
+public function actionGettaluk(){
+
+	$url="https://www.wikivillage.in/villages/findvalues";
+	$client = new Client();
+	//$district_id=40535;
+	$districts=Districts::model()->findAll();
+
+	foreach($districts as $district_value)
+	{
+		$district_id=$district_value->district_id;
+		$i=1;
+		$res = $client->request('POST', $url,[
+			'form_params' => [
+				'type' => 'district',
+				'id' => $district_id
+			]
+		]);
+		$contents=$res->getBody()->getContents();
+		$crawler=new Crawler($contents);
+		
+		foreach ($crawler->filter('li') as $li) {
+			$taluk_id=$crawler->filter('li')->eq($i-1)->attr('data-val');
+			$taluk_name=$crawler->filter('li')->filter('div')->eq($i-1)->html();
+			echo "taluk_id->".$taluk_id;
+			echo "taluk_name->".$taluk_name;
+			$taluk=new Taluks;
+			$taluk->taluk_id=$taluk_id;
+			$taluk->district_id=$district_id;
+			$taluk->taluk_name=$taluk_name;
+			$taluk->save(false);
+			$i++;
+		}
+	//exit;
+	}
+}
+
+public function actionGetvillage(){
+
+	$url="https://www.wikivillage.in/villages/findvalues";
+	$client = new Client();
+	//$district_id=40535;
+	$taluks=Taluks::model()->findAllBySql("Select * from taluks where vi_status=0 LIMIT 1000");
+
+	if(empty($taluks)){
+		echo "All Taluks Finished";
+	}
+
+	$curl_arr = array();
+	$master = curl_multi_init();
+	$i=0;
+	foreach($taluks as $taluk_value)
+	{
+		$taluk_id=$taluk_value->taluk_id;
+		//$taluk_id="2343186";
+		//$i=1;
+
+		//curl requests
+
+		$curl_arr[$i] = curl_init($url);
+		curl_setopt($curl_arr[$i], CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl_arr[$i], CURLOPT_POSTFIELDS,
+            "type=block&id=".$taluk_id);
+		//sleep(2);
+		curl_multi_add_handle($master, $curl_arr[$i]);
+		
+		
+		// $res = $client->request('POST', $url,[
+		// 	'form_params' => [
+		// 		'type' => 'block',
+		// 		'id' => $taluk_id
+		// 	]
+		// ]);
+		// $contents=$res->getBody()->getContents();
+
+		// $crawler=new Crawler($contents);
+		
+		// foreach ($crawler->filter('li') as $li) {
+		// 	$village_id=$crawler->filter('li')->eq($i-1)->attr('data-val');
+		// 	$village_name=$crawler->filter('li')->filter('div')->filter('a')->eq($i-1)->html();
+		// 	//echo "village_id->".$village_id;
+		// 	//echo "village_name->".$village_name;
+		// 	$village=new Villages;
+		// 	$village->village_id=$village_id;
+		// 	$village->taluk_id=$taluk_id;
+		// 	$village->village_name=$village_name;
+		// 	$valid=$village->save(false);
+			
+		// 	$i++;
+		// }
+		// if($valid)
+		// 	{
+		// 		$taluk_model=Taluks::model()->findByPk($taluk_value->id);
+		// 		$taluk_model->vi_status=1;
+		// 		$taluk_model->save(false);
+		// 	}
+		//exit;
+		$i++;
+	}
+	$i=0;
+	do {
+		$status=curl_multi_exec($master,$running);
+	} while($running > 0);
+	
+	if($status > 0) {
+		 echo "ERROR!\n " . curl_multi_strerror($status);
+	}
+
+	echo "results: ";
+	foreach($taluks as $taluk_value)
+	{
+		$taluk_id=$taluk_value->taluk_id;
+		$j=1;
+		$results = curl_multi_getcontent  ( $curl_arr[$i]  );
+		if (!curl_errno($curl_arr[$i])) {
+			$info = curl_getinfo($curl_arr[$i]);
+			echo 'Took ', $info['total_time'], ' seconds to send a request to ', $info['url'], "\n";
+		}
+		$crawler=new Crawler($results);
+		foreach ($crawler->filter('li') as $li) {
+
+			$village_id=$crawler->filter('li')->eq($j-1)->attr('data-val');
+			$village_name=$crawler->filter('li')->filter('div')->filter('a')->eq($j-1)->html();
+			//echo "village_id->".$village_id;
+			//echo "village_name->".$village_name;
+			$village=new Villages;
+			$village->village_id=$village_id;
+			$village->taluk_id=$taluk_id;
+			$village->village_name=$village_name;
+			$valid=$village->save(false);
+			$j++;
+		}
+
+		if($valid)
+		{
+			$taluk_model=Taluks::model()->findByPk($taluk_value->id);
+			//print_r($taluk_model);exit;
+			$taluk_model->vi_status=1;
+			$taluk_model->save(false);
+		}
+
+		//echo( $i . "\n" . $results . "\n");
+		$i++;
+	}
+	echo 'done';
+}
 }
